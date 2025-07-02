@@ -63,13 +63,10 @@ class RepVGG_Block(nn.Module):
             weight_id , bias_id = self.combine_conv_bn(self.id_with_bn)
             weight_id = F.pad(weight_id,[1,1,1,1])
 
-            print(weight_id.shape , '\n' , weight_1x1.shape)
-            exit()
-
             new_weight = new_weight + weight_id
             new_bias = new_bias + bias_id
         
-        new_conv = nn.Conv2d(self.in_channels,self.out_channels,3,self.stride,bias=True)
+        new_conv = nn.Conv2d(self.in_channels,self.out_channels,3,self.stride,groups=self.conv_group,padding=self.pad,bias=True)
         new_conv.weight.data = new_weight
         new_conv.bias.data = new_bias
         
@@ -82,12 +79,16 @@ class RepVGG_Block(nn.Module):
         else :
             bn = branch
             channels = self.in_channels
-            conv_weight = torch.ones((channels,channels,1,1),dtype=bn.weight.dtype,device=bn.weight.device) 
+            dtype , device = bn.weight.dtype , bn.weight.device
+
+            conv_weight = torch.zeros((channels,channels//self.conv_group,1,1),dtype=dtype,device=device)
+            idx = torch.arange(channels)
+            conv_weight[idx,idx%(channels//self.conv_group), 0 , 0] = 1
 
         gamma , beta , mu , sigma = bn.weight,bn.bias,bn.running_mean,(bn.running_var + bn.eps) ** 0.5
 
         new_conv_weight = conv_weight * (gamma / sigma).reshape(-1,1,1,1)
-        new_conv_bias = beta - (mu * gamma / sigma).reshape(-1,1,1,1)
+        new_conv_bias = beta - (mu * gamma / sigma)
 
         return new_conv_weight , new_conv_bias
 
