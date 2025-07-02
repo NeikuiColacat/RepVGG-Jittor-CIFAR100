@@ -4,13 +4,13 @@ import torch
 
 class RepVGG_Block(nn.Module):
 
-    def __init__(self, in_channels, out_channels, conv_group, stride,padding):
+    def __init__(self, in_channels, out_channels, conv_group, stride):
         super().__init__()
+        assert(in_channels % conv_group == 0 and out_channels % conv_group == 0)
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.conv_group = conv_group
         self.stride = stride
-        self.pad = padding
         self.infer = False
 
         get_conv_with_bn = lambda kernel_size , padding : nn.Sequential(
@@ -27,8 +27,8 @@ class RepVGG_Block(nn.Module):
         )
         
         if in_channels == out_channels and stride == 1 : self.id_with_bn= nn.BatchNorm2d(in_channels)
-        self.conv_1x1_with_bn = get_conv_with_bn(1,padding-1)
-        self.conv_3x3_with_bn = get_conv_with_bn(3,padding)
+        self.conv_1x1_with_bn = get_conv_with_bn(1,0)
+        self.conv_3x3_with_bn = get_conv_with_bn(3,1)
         self.infer_conv = None
     
     def forward(self,input):
@@ -66,7 +66,7 @@ class RepVGG_Block(nn.Module):
             new_weight = new_weight + weight_id
             new_bias = new_bias + bias_id
         
-        new_conv = nn.Conv2d(self.in_channels,self.out_channels,3,self.stride,groups=self.conv_group,padding=self.pad,bias=True)
+        new_conv = nn.Conv2d(self.in_channels,self.out_channels,3,self.stride,groups=self.conv_group,padding=1,bias=True)
         new_conv.weight.data = new_weight
         new_conv.bias.data = new_bias
         
@@ -91,6 +91,3 @@ class RepVGG_Block(nn.Module):
         new_conv_bias = beta - (mu * gamma / sigma)
 
         return new_conv_weight , new_conv_bias
-
-
-        
