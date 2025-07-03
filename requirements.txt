@@ -1,6 +1,7 @@
 torch==2.0.0+cu118
 torchvision==0.15.0+cu118
 torchaudio==2.0.0+cu118
+pyyaml
 timm==0.6.12
 numpy
 matplotlib

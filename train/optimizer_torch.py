@@ -1,0 +1,45 @@
+import torch 
+import yaml
+from torch import nn
+
+def get_param(model:nn.Module):
+    weight_decay_param = []
+    no_decay_param = []
+
+    get_param = lambda module : [
+        param for param in module.parameters(False)
+        if param.requires_grad
+    ]
+
+    for module in model.modules():
+        if isinstance(module , (nn.Conv2d,nn.Linear)) : 
+            weight_decay_param = weight_decay_param + get_param(module)
+        else :
+            no_decay_param = no_decay_param + get_param(module)
+    
+    return [
+        {'params':weight_decay_param},
+        {'params':no_decay_param,'weight_decay':0.}
+    ]
+
+
+def get_optimizer(model,config_yaml_path):
+    with open(config_yaml_path,'r') as f:
+        config = yaml.safe_load(f)
+    
+    weight_decay = config['weight_decay']
+    lr = config['lr']
+    momentum = config['momentum'] 
+
+    res = torch.optim.SGD(
+        get_param(model),
+        lr = lr,
+        momentum= momentum,
+        nesterov=True,
+        weight_decay=weight_decay
+    )
+
+    return res
+
+
+    
