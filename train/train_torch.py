@@ -4,6 +4,8 @@ from torchvision import datasets
 from torchvision import transforms
 from torch import nn
 from tqdm import tqdm
+from torch.cuda.amp import autocast, GradScaler
+
 import yaml
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -39,7 +41,7 @@ def get_imagenet_dataloaders(config):
         num_workers=num_workers,
         pin_memory=True,
         persistent_workers=True,
-        prefetch_factor=2
+        prefetch_factor=4
     )
 
     val_loader = DataLoader(
@@ -49,7 +51,7 @@ def get_imagenet_dataloaders(config):
         num_workers=num_workers,
         pin_memory=True,
         persistent_workers=True,
-        prefetch_factor=2
+        prefetch_factor=4
     )
     
     return train_loader, val_loader

@@ -13,6 +13,8 @@ lr : 0.1
 weight_decay : 0.0001 
 momentum : 0.9
 num_workers : 16
+warmup_epochs : 5
+min_lr : 0.00001 
 
 chk_point_dir : ./chk_points/torch_A0
 log_dir : ./logs/torch_A0

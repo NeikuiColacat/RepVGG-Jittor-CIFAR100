@@ -84,7 +84,8 @@ def train_model(config_path, resume_path = None):
         )
         
         scheduler.step()
-        cur_lr = scheduler.get_last_lr()[0]
+        cur_lr = optimizer.param_groups[0]['lr']
+
         
         epoch_time = time.time() - epoch_start_time
         
