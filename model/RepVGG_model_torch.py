@@ -1,4 +1,4 @@
-from model.RepVGG_block import RepVGG_Block
+from model.RepVGG_block_torch import RepVGG_Block
 import torch.nn as nn
 import torch.nn.functional as F
 import torch

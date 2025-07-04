@@ -23,9 +23,7 @@ def filter_param(model:nn.Module):
     ]
 
 
-def get_optimizer(model,config_yaml_path):
-    with open(config_yaml_path,'r') as f:
-        config = yaml.safe_load(f)
+def get_optimizer(model,config):
     
     weight_decay = config['weight_decay']
     lr = config['lr']
@@ -41,5 +39,14 @@ def get_optimizer(model,config_yaml_path):
 
     return res
 
+def get_scheduler(optimizer,config):
+    
+    epochs = config['epochs']
+
+    return torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer,
+        T_max=epochs,
+        eta_min=0
+    )
 
     

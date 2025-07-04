@@ -1,4 +1,4 @@
-from model.RepVGG_model import RepVGG_Model
+from model.RepVGG_model_torch import RepVGG_Model
 import torch
 import torch.nn as nn
 import torch.optim as optim

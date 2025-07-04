@@ -1,4 +1,4 @@
-from model.RepVGG_block import RepVGG_Block
+from model.RepVGG_block_torch import RepVGG_Block
 import torch
 
 def test_case(in_c, out_c, groups, stride, H, W):

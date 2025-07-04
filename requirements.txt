@@ -9,3 +9,5 @@ tqdm
 opencv-python
 tensorboard
 jittor
+pandas
+psutil
