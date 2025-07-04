@@ -1,6 +1,3 @@
-torch==2.7.1+cu118
-torchvision
-torchaudio
 pyyaml
 timm
 numpy
