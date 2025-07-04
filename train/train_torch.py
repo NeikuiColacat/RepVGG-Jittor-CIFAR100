@@ -58,7 +58,7 @@ def get_imagenet_dataloaders(config):
 
 
 
-def train_one_epoch(model: nn.Module, train_lodaer: DataLoader, optimizer: torch.optim.SGD, loss_func : nn.CrossEntropyLoss , epoch_idx):
+def train_one_epoch(model: nn.Module, train_lodaer: DataLoader, optimizer: torch.optim.SGD, loss_func : nn.CrossEntropyLoss , epoch_idx , scaler):
     model.train()
     cur_loss = 0.
     ok_num = 0
@@ -69,13 +69,16 @@ def train_one_epoch(model: nn.Module, train_lodaer: DataLoader, optimizer: torch
     for batch_idx , (data, target) in enumerate(process_bar):
 
         data , target = data.to(device,non_blocking=True) , target.to(device,non_blocking=True) ,
+        data = data.to(memory_format=torch.channels_last)
         optimizer.zero_grad()
 
-        output = model(data)
-        loss = loss_func(output , target) 
+        with torch.cuda.amp.autocast('cuda'):
+            output = model(data)
+            loss = loss_func(output , target) 
 
-        loss.backward()
-        optimizer.step()
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
 
         cur_loss += loss.item()
         pred_tar = output.argmax(dim = 1)
@@ -107,9 +110,12 @@ def val_one_epoch(model:nn.Module,val_loader,loss_func:nn.CrossEntropyLoss):
 
     for data , target in process_bar:
         data , target = data.to(device,non_blocking=True) , target.to(device,non_blocking=True) ,
+        data = data.to(memory_format=torch.channels_last) 
 
-        output = model(data)
-        loss = loss_func(output, target)
+
+        with torch.cuda.amp.autocast('cuda'):
+            output = model(data)
+            loss = loss_func(output, target)
         
         cur_loss += loss.item()
         

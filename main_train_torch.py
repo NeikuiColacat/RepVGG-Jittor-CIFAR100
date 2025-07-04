@@ -27,7 +27,8 @@ def save_chk_point(state, save_dir, filename):
     filepath = os.path.join(save_dir, filename)
     torch.save(state, filepath)
 
-def load_chk_point(model, optimizer, scheduler, checkpoint_path):
+
+def load_chk_point(model, optimizer, scheduler, scaler,  checkpoint_path):
     assert(os.path.exists(checkpoint_path))
     print(f"Loading checkpoint from {checkpoint_path}")
     checkpoint = torch.load(checkpoint_path, map_location='cpu')
@@ -35,6 +36,7 @@ def load_chk_point(model, optimizer, scheduler, checkpoint_path):
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+    scaler.load_state_dict(checkpoint['scaler_state_dict'])
     
     return checkpoint['epoch'], checkpoint.get('best_acc', 0.0)
 
@@ -47,14 +49,21 @@ def train_model(config_path, resume_path = None):
     save_dir = config['chk_point_dir']
     model_name = config['model_name']
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
     model = create_model(config)
     model = model.to(device)
+    model.to(memory_format = torch.channels_last)
+    model = torch.compile(model)
+
     optimizer = get_optimizer(model, config)
     scheduler = get_scheduler(optimizer, config)
-    loss_func = nn.CrossEntropyLoss()
     train_loader, val_loader = get_imagenet_dataloaders(config)
+
+    loss_func = nn.CrossEntropyLoss()
     start_epoch = 0
     best_top1_acc = 0.0
+    scaler = torch.cuda.amp.GradScaler('cuda')
+
     logger = Logger(
         log_dir=config['log_dir'],
         framework='torch',
@@ -62,7 +71,7 @@ def train_model(config_path, resume_path = None):
     )
     
 
-    if resume_path: start_epoch, best_top1_acc = load_chk_point(model, optimizer, scheduler,resume_path)
+    if resume_path: start_epoch, best_top1_acc = load_chk_point(model, optimizer, scheduler,scaler,resume_path)
     for epoch in range(start_epoch, epochs):
         print(f"eopch : {epoch}" + "="*80 + "\n")
         
@@ -74,7 +83,8 @@ def train_model(config_path, resume_path = None):
             train_lodaer=train_loader, 
             optimizer=optimizer,
             loss_func=loss_func,
-            epoch_idx=epoch 
+            epoch_idx=epoch ,
+            scaler = scaler
         )
         
         val_loss, val_top1_acc, val_top5_acc = val_one_epoch(
@@ -111,6 +121,7 @@ def train_model(config_path, resume_path = None):
                 'scheduler_state_dict': scheduler.state_dict(),
                 'best_acc': val_top1_acc,
                 'config': config,
+                'scaler_state_dict': scaler.state_dict(),  
             }, save_dir, filename)
 
     save_chk_point({
@@ -119,7 +130,9 @@ def train_model(config_path, resume_path = None):
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict(),
         'best_acc': best_top1_acc,
-        'config': config, }, 
+        'config': config, 
+        'scaler_state_dict': scaler.state_dict(),  
+        }, 
         save_dir, 
         'final_model.pth'
     )
@@ -146,16 +159,13 @@ def main():
     )
     
 if __name__ == "__main__":
-    # 设置随机种子
-    torch.manual_seed(42)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(42)
-        torch.cuda.manual_seed_all(42)
-    
-    # 设置CUDA优化
-    if torch.cuda.is_available():
-        torch.backends.cudnn.benchmark = True
-        torch.backends.cudnn.deterministic = False
+
+    LUCK_NUMBER = 998244353
+    torch.manual_seed(LUCK_NUMBER)
+    torch.cuda.manual_seed(LUCK_NUMBER)
+    torch.cuda.manual_seed_all(LUCK_NUMBER)
+
+    torch.backends.cudnn.benchmark = True
 
     main()
     
