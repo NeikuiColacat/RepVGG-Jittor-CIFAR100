@@ -62,7 +62,7 @@ def train_model(config_path, resume_path = None):
     loss_func = nn.CrossEntropyLoss()
     start_epoch = 0
     best_top1_acc = 0.0
-    scaler = torch.cuda.amp.GradScaler('cuda')
+    scaler = torch.amp.GradScaler("cuda")
 
     logger = Logger(
         log_dir=config['log_dir'],

@@ -72,7 +72,8 @@ def train_one_epoch(model: nn.Module, train_lodaer: DataLoader, optimizer: torch
         data = data.to(memory_format=torch.channels_last)
         optimizer.zero_grad()
 
-        with torch.cuda.amp.autocast('cuda'):
+        with torch.autocast(device_type='cuda'):
+
             output = model(data)
             loss = loss_func(output , target) 
 
@@ -113,7 +114,7 @@ def val_one_epoch(model:nn.Module,val_loader,loss_func:nn.CrossEntropyLoss):
         data = data.to(memory_format=torch.channels_last) 
 
 
-        with torch.cuda.amp.autocast('cuda'):
+        with torch.autocast(device_type='cuda'):
             output = model(data)
             loss = loss_func(output, target)
         
