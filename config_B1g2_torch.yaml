@@ -5,14 +5,17 @@ scale_b: 4
 group_conv : 2
 
 data_path: "/root/autodl-tmp/imagenet"
-batch_size: 128
+batch_size: 1024 
 image_size: 224
 
-epochs: 120
-lr: 0.1
-weight_decay: 1e-4
-momentum: 0.9
+epochs : 120
+lr : 0.1
+weight_decay : 0.0001 
+momentum : 0.9
 num_workers : 16
+warmup_epochs : 5
+min_lr : 0.00001 
+
 
 chk_point_dir : ./chk_points/torch_B1g2
 log_dir : ./logs/torch_B1g2
