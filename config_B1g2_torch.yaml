@@ -5,7 +5,7 @@ scale_b: 4
 group_conv : 2
 
 data_path: "/root/autodl-tmp/imagenet"
-batch_size: 512 
+batch_size: 576 
 image_size: 224
 
 epochs : 120
