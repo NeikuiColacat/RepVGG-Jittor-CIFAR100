@@ -16,7 +16,7 @@ def create_model(config):
         channel_scale_A=config['scale_a'],
         channel_scale_B=config['scale_b'],
         group_conv=config['group_conv'],
-        classify_classes=10,  
+        classify_classes=1000,  
         model_type=config['model_type']
     )
 
@@ -48,36 +48,7 @@ def train_model(config_path, resume_path = None):
 
     optimizer = get_optimizer(model, config)
     scheduler = get_scheduler(optimizer, config)
-    # train_loader, val_loader = get_imagenet_dataloaders(config)
-
-
-    ###########################
-    normalize = jt.transform.ImageNormalize(
-        mean=[0.4914, 0.4822, 0.4465], 
-        std=[0.2023, 0.1994, 0.2010]
-    )
-    
-    train_transform = jt.transform.Compose([
-        jt.transform.Resize((36, 36)),  # 先放大
-        jt.transform.RandomCrop(32),    # 然后随机裁剪到32x32
-        jt.transform.RandomHorizontalFlip(0.5),
-        jt.transform.ToTensor(),
-        normalize
-    ])
-    
-    test_transform = jt.transform.Compose([
-        jt.transform.ToTensor(),
-        normalize
-    ])
-    
-    # 加载数据集
-    train_dataset = CIFAR10(train=True, transform=train_transform, download=True)
-    test_dataset = CIFAR10(train=False, transform=test_transform)
-    
-    train_loader = train_dataset.set_attrs(batch_size=128, shuffle=True,num_workers=16)
-    val_loader = test_dataset.set_attrs(batch_size=256, shuffle=False,num_workers=16)
-
-    ############################
+    train_loader, val_loader = get_imagenet_dataloaders(config)
 
     loss_func = nn.CrossEntropyLoss()
     start_epoch = 0

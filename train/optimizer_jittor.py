@@ -8,18 +8,16 @@ def filter_param(model: nn.Module):
     weight_decay_param = []
     no_decay_param = []
 
-    get_param = lambda module : (
-        [param for param in module.parameters() if param.requires_grad]
-    )
-
     for module in model.modules():
         if isinstance(module, (nn.Conv2d, nn.Linear)):
-            weight_decay_param += get_param(module)
+            weight_decay_param.append(module.weight)
+            if module.bias is not None :
+                no_decay_param.append(module.bias)
         else:
-            no_decay_param += get_param(module)
+            no_decay_param += [p for p in module.parameters(recurse = False) if p.requires_grad]
     
     return [
-        {'params': weight_decay_param},
+        {'params': weight_decay_param , 'weight_decay' : 1e-4},
         {'params': no_decay_param, 'weight_decay': 0}
     ]
 
@@ -29,7 +27,7 @@ def get_optimizer(model, config):
     momentum = config['momentum']
 
     return optim.SGD(
-        model.parameters(),
+        filter_param(model),
         lr=lr,
         momentum=momentum,
         weight_decay=weight_decay,

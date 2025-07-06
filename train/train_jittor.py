@@ -68,7 +68,7 @@ def train_one_epoch(model: nn.Module, train_loader, optimizer, loss_func, epoch_
         
         optimizer.zero_grad()
         output = model(data)
-        loss = nn.cross_entropy_loss(output, target)
+        loss = loss_func(output, target)
 
         optimizer.backward(loss)
         optimizer.step()
@@ -101,7 +101,7 @@ def val_one_epoch(model: nn.Module, val_loader, loss_func):
     process_bar = tqdm(val_loader, desc='validating')
     for data, target in process_bar:
         output = model(data)
-        loss = nn.cross_entropy_loss(output, target)
+        loss = loss_func(output, target)
         
         cur_loss += loss.item()
         
