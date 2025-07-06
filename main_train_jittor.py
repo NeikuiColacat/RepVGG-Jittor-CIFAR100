@@ -1,43 +1,39 @@
-import torch
-import torch.nn as nn
+import jittor as jt
+import jittor.nn as nn
 import os
-import sys
 import time
+
 import yaml
 from tqdm import tqdm
-
-from model.RepVGG_model_torch import RepVGG_Model
-from train.train_torch import get_imagenet_dataloaders, train_one_epoch, val_one_epoch
-from train.optimizer_torch import get_optimizer, get_scheduler
+from model.RepVGG_model_jittor import RepVGG_Model 
+from train.train_jittor import get_imagenet_dataloaders , train_one_epoch , val_one_epoch
+from train.optimizer_jittor import get_optimizer, get_scheduler
 from utils.train_logger import Logger
 
 def create_model(config):
-    model = RepVGG_Model(
+    return RepVGG_Model(
         channel_scale_A=config['scale_a'],
         channel_scale_B=config['scale_b'],
         group_conv=config['group_conv'],
         classify_classes=1000,  
         model_type=config['model_type']
     )
-    
-    return model
 
 def save_chk_point(state, save_dir, filename):
     os.makedirs(save_dir, exist_ok=True)
     filepath = os.path.join(save_dir, filename)
-    torch.save(state, filepath)
+    jt.save(state, filepath)
 
-
-def load_chk_point(model, optimizer, scheduler, scaler,  checkpoint_path):
+def load_chk_point(model, optimizer, scheduler, checkpoint_path):
     assert(os.path.exists(checkpoint_path))
-    checkpoint = torch.load(checkpoint_path)
+    print(f"Loading checkpoint from {checkpoint_path}")
+    checkpoint = jt.load(checkpoint_path)
     
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-    scaler.load_state_dict(checkpoint['scaler_state_dict'])
     
-    return checkpoint['epoch'], checkpoint['acc']
+    return checkpoint['epoch'], checkpoint.get('acc', 0.0)
 
 def train_model(config_path, resume_path = None):
     
@@ -47,12 +43,8 @@ def train_model(config_path, resume_path = None):
     epochs = config['epochs']
     save_dir = config['chk_point_dir']
     model_name = config['model_name']
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     model = create_model(config)
-    model = model.to(device)
-    model.to(memory_format = torch.channels_last)
-    model = torch.compile(model)
 
     optimizer = get_optimizer(model, config)
     scheduler = get_scheduler(optimizer, config)
@@ -61,16 +53,15 @@ def train_model(config_path, resume_path = None):
     loss_func = nn.CrossEntropyLoss()
     start_epoch = 0
     best_top1_acc = 0.0
-    scaler = torch.amp.GradScaler("cuda")
 
     logger = Logger(
         log_dir=config['log_dir'],
-        framework='torch',
+        framework='jittor',
         model_name=model_name
     )
     
 
-    if resume_path: start_epoch, best_top1_acc = load_chk_point(model, optimizer, scheduler,scaler,resume_path)
+    if resume_path: start_epoch, best_top1_acc = load_chk_point(model, optimizer, scheduler,resume_path)
     for epoch in range(start_epoch, epochs):
         
         logger.start_epoch_monitoring()
@@ -82,7 +73,6 @@ def train_model(config_path, resume_path = None):
             optimizer=optimizer,
             loss_func=loss_func,
             epoch_idx=epoch ,
-            scaler = scaler
         )
         
         val_loss, val_top1_acc, val_top5_acc = val_one_epoch(
@@ -129,6 +119,7 @@ def train_model(config_path, resume_path = None):
                 'config': config,
             }, save_dir, f'checkpoint_epoch_{epoch}.pth')
 
+
     save_chk_point({
         'epoch': epochs,
         'model_state_dict': model.state_dict(),
@@ -136,15 +127,12 @@ def train_model(config_path, resume_path = None):
         'scheduler_state_dict': scheduler.state_dict(),
         'acc': best_top1_acc,
         'config': config, 
-        'scaler_state_dict': scaler.state_dict(),  
         }, 
         save_dir, 
         'final_model.pth'
     )
 
     logger.print_summary()
-    
-    
 
 def main():
     import argparse
@@ -162,15 +150,12 @@ def main():
         config_path=config_path,
         resume_path=resume_path
     )
-    
+
 if __name__ == "__main__":
 
     LUCK_NUMBER = 998244353
-    torch.manual_seed(LUCK_NUMBER)
-    torch.cuda.manual_seed(LUCK_NUMBER)
-    torch.cuda.manual_seed_all(LUCK_NUMBER)
-
-    torch.backends.cudnn.benchmark = True
+    jt.seed(LUCK_NUMBER)
+    jt.flags.use_cuda = 1
 
     main()
     
