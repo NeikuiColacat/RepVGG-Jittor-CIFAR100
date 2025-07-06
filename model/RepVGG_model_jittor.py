@@ -51,7 +51,7 @@ class RepVGG_Model(nn.Module):
             self.pre_stage_channels = channels_size
         return res
     
-    def execute(self, input):  # forward -> execute
+    def execute(self, input): 
         output = input
         for block in self.RepVGG_Blocks: 
             output = block(output)

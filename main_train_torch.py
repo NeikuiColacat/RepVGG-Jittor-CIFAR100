@@ -142,9 +142,6 @@ def train_model(config_path, resume_path = None):
         'final_model.pth'
     )
 
-    logger.print_summary()
-    
-    
 
 def main():
     import argparse
