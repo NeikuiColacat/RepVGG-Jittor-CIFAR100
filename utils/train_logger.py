@@ -25,7 +25,7 @@ class Logger:
             'cpu_percent': [] ,
             'gpu_percent': [],
             'gpu_mem': [],
-            'cpu_mem': [],
+            'cpu_mem_percent': [],
         }
         
         self.monitoring = False
@@ -44,7 +44,7 @@ class Logger:
             'avg_gpu_percent',  
             'avg_cpu_percent',
             'avg_gpu_memory_used_gb',
-            'avg_cpu_memory_used_gb',
+            'avg_cpu_memory_percent',
             'learning_rate',
             'timestamp',
             'framework'
@@ -60,9 +60,8 @@ class Logger:
                 cpu_percent = psutil.cpu_percent(interval=0.1)
                 self.epoch_metrics['cpu_percent'].append(cpu_percent)
                 
-                memory_info = psutil.virtual_memory()
-                cpu_memory_used_gb = memory_info.used / (1024**3)
-                self.epoch_metrics['cpu_mem'].append(cpu_memory_used_gb)
+                mem = psutil.virtual_memory()
+                self.epoch_metrics['cpu_mem_percent'].append(mem.percent)
                 
                 gpu = GPUtil.getGPUs()[0]
                 self.epoch_metrics['gpu_percent'].append(gpu.load * 100)
@@ -92,7 +91,7 @@ class Logger:
     def get_epoch_avg_metrics(self):
 
         gpu_mem_list = self.epoch_metrics['gpu_mem']
-        cpu_mem_list = self.epoch_metrics['cpu_mem']
+        cpu_mem_list = self.epoch_metrics['cpu_mem_percent']
         gpu_percent_list = self.epoch_metrics['gpu_percent']
         cpu_percent_list = self.epoch_metrics['cpu_percent']
 
@@ -102,7 +101,7 @@ class Logger:
             'avg_gpu_mem_used_gb': avg(gpu_mem_list),
             'avg_gpu_percent': avg(gpu_percent_list), 
             'avg_cpu_percent': avg(cpu_percent_list),
-            'avg_cpu_mem_used_gb': avg(cpu_mem_list),
+            'avg_cpu_mem_percent': avg(cpu_mem_list),
         } 
     
     def format_time(self, seconds):
@@ -132,7 +131,7 @@ class Logger:
             round(metrics['avg_gpu_percent'],2),  
             round(metrics['avg_cpu_percent'],2),  
             round(metrics['avg_gpu_mem_used_gb'],2),  
-            round(metrics['avg_cpu_mem_used_gb'],2),  
+            round(metrics['avg_cpu_mem_percent'],2),  
             f"{learning_rate:.6f}",
             timestamp,
             self.framework
