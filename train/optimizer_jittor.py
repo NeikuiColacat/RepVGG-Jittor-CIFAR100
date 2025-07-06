@@ -29,7 +29,7 @@ def get_optimizer(model, config):
     momentum = config['momentum']
 
     return optim.SGD(
-        filter_param(model),
+        model.parameters(),
         lr=lr,
         momentum=momentum,
         weight_decay=weight_decay,

@@ -12,6 +12,8 @@ class RepVGG_Block(nn.Module):
         self.conv_group = conv_group
         self.stride = stride
         self.infer = False
+        self.use_identity =  (in_channels == out_channels and stride == 1)
+        self.id_with_bn = None
 
         def get_conv_with_bn(kernel_size, padding):
             return nn.Sequential(
@@ -27,7 +29,7 @@ class RepVGG_Block(nn.Module):
                 nn.BatchNorm2d(out_channels),
             )
         
-        if in_channels == out_channels and stride == 1:
+        if self.use_identity:
             self.id_with_bn = nn.BatchNorm2d(in_channels)
         self.conv_1x1_with_bn = get_conv_with_bn(1, 0)
         self.conv_3x3_with_bn = get_conv_with_bn(3, 1)
@@ -38,7 +40,7 @@ class RepVGG_Block(nn.Module):
             return nn.relu(self.infer_conv(input))
         
         output = self.conv_1x1_with_bn(input) + self.conv_3x3_with_bn(input)
-        if hasattr(self, 'id_with_bn'):
+        if self.use_identity: 
             output = output + self.id_with_bn(input)
 
         output = nn.relu(output)
@@ -48,10 +50,11 @@ class RepVGG_Block(nn.Module):
         self.infer = True
         self.infer_conv = self.combine_3_branch()
 
-        self.conv_1x1_with_bn = None
-        self.conv_3x3_with_bn = None
-        if hasattr(self, 'id_with_bn'):
-            self.id_with_bn = None
+        delattr(self,'conv_1x1_with_bn')
+        delattr(self,'conv_3x3_with_bn')
+        if self.use_identity : delattr(self,'id_with_bn')
+
+        jt.clean()
 
     def combine_3_branch(self):
         weight_3x3, bias_3x3 = self.combine_conv_bn(self.conv_3x3_with_bn)
@@ -63,7 +66,7 @@ class RepVGG_Block(nn.Module):
         new_weight = weight_3x3 + weight_1x1
         new_bias = bias_1x1 + bias_3x3
 
-        if hasattr(self, 'id_with_bn'):
+        if self.use_identity: 
             weight_id, bias_id = self.combine_conv_bn(self.id_with_bn)
             weight_id = jt.nn.pad(weight_id, [1, 1, 1, 1])
 
@@ -81,7 +84,7 @@ class RepVGG_Block(nn.Module):
         )
         new_conv.weight = new_weight
         new_conv.bias = new_bias
-        
+
         return new_conv
         
     def combine_conv_bn(self, branch):

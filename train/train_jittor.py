@@ -68,7 +68,7 @@ def train_one_epoch(model: nn.Module, train_loader, optimizer, loss_func, epoch_
         
         optimizer.zero_grad()
         output = model(data)
-        loss = loss_func(output, target)
+        loss = nn.cross_entropy_loss(output, target)
 
         optimizer.backward(loss)
         optimizer.step()
@@ -101,7 +101,7 @@ def val_one_epoch(model: nn.Module, val_loader, loss_func):
     process_bar = tqdm(val_loader, desc='validating')
     for data, target in process_bar:
         output = model(data)
-        loss = loss_func(output, target)
+        loss = nn.cross_entropy_loss(output, target)
         
         cur_loss += loss.item()
         
@@ -124,13 +124,14 @@ def val_one_epoch(model: nn.Module, val_loader, loss_func):
 
     return cur_loss , top1_acc, top5_acc
 
+@jt.no_grad()
 def cal_topk_num(output: jt.Var, target: jt.Var, topk):
     maxk = max(topk)
     
     _, pred = jt.topk(output, maxk, dim=1)
     target = target.reshape(-1, 1).expand_as(pred)
 
-    correct = pred.eq(target)
+    correct = (pred == target)
     res = []
     for k in topk:
         correct_k = correct[:, :k].reshape(-1).float().sum()

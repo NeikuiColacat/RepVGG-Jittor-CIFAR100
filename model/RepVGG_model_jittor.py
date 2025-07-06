@@ -1,4 +1,4 @@
-from RepVGG_block_jittor import RepVGG_Block
+from .RepVGG_block_jittor import RepVGG_Block
 import jittor as jt
 import jittor.nn as nn
 

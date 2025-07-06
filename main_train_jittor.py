@@ -9,13 +9,14 @@ from model.RepVGG_model_jittor import RepVGG_Model
 from train.train_jittor import get_imagenet_dataloaders , train_one_epoch , val_one_epoch
 from train.optimizer_jittor import get_optimizer, get_scheduler
 from utils.train_logger import Logger
+from jittor.dataset import CIFAR10
 
 def create_model(config):
     return RepVGG_Model(
         channel_scale_A=config['scale_a'],
         channel_scale_B=config['scale_b'],
         group_conv=config['group_conv'],
-        classify_classes=1000,  
+        classify_classes=10,  
         model_type=config['model_type']
     )
 
@@ -24,15 +25,14 @@ def save_chk_point(state, save_dir, filename):
     filepath = os.path.join(save_dir, filename)
     jt.save(state, filepath)
 
-def load_chk_point(model, optimizer, scheduler, checkpoint_path):
+def load_chk_point(model, optimizer, checkpoint_path):
     assert(os.path.exists(checkpoint_path))
     print(f"Loading checkpoint from {checkpoint_path}")
     checkpoint = jt.load(checkpoint_path)
     
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-    
+
     return checkpoint['epoch'], checkpoint.get('acc', 0.0)
 
 def train_model(config_path, resume_path = None):
@@ -48,7 +48,36 @@ def train_model(config_path, resume_path = None):
 
     optimizer = get_optimizer(model, config)
     scheduler = get_scheduler(optimizer, config)
-    train_loader, val_loader = get_imagenet_dataloaders(config)
+    # train_loader, val_loader = get_imagenet_dataloaders(config)
+
+
+    ###########################
+    normalize = jt.transform.ImageNormalize(
+        mean=[0.4914, 0.4822, 0.4465], 
+        std=[0.2023, 0.1994, 0.2010]
+    )
+    
+    train_transform = jt.transform.Compose([
+        jt.transform.Resize((36, 36)),  # 先放大
+        jt.transform.RandomCrop(32),    # 然后随机裁剪到32x32
+        jt.transform.RandomHorizontalFlip(0.5),
+        jt.transform.ToTensor(),
+        normalize
+    ])
+    
+    test_transform = jt.transform.Compose([
+        jt.transform.ToTensor(),
+        normalize
+    ])
+    
+    # 加载数据集
+    train_dataset = CIFAR10(train=True, transform=train_transform, download=True)
+    test_dataset = CIFAR10(train=False, transform=test_transform)
+    
+    train_loader = train_dataset.set_attrs(batch_size=128, shuffle=True,num_workers=16)
+    val_loader = test_dataset.set_attrs(batch_size=256, shuffle=False,num_workers=16)
+
+    ############################
 
     loss_func = nn.CrossEntropyLoss()
     start_epoch = 0
@@ -61,7 +90,7 @@ def train_model(config_path, resume_path = None):
     )
     
 
-    if resume_path: start_epoch, best_top1_acc = load_chk_point(model, optimizer, scheduler,resume_path)
+    if resume_path: start_epoch, best_top1_acc = load_chk_point(model, optimizer, resume_path)
     for epoch in range(start_epoch, epochs):
         
         logger.start_epoch_monitoring()
@@ -69,7 +98,7 @@ def train_model(config_path, resume_path = None):
         
         train_loss, train_acc = train_one_epoch(
             model=model,
-            train_lodaer=train_loader, 
+            train_loader=train_loader,
             optimizer=optimizer,
             loss_func=loss_func,
             epoch_idx=epoch ,
@@ -104,7 +133,6 @@ def train_model(config_path, resume_path = None):
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
-                'scheduler_state_dict': scheduler.state_dict(),
                 'acc': val_top1_acc,
                 'config': config,
             }, save_dir, 'best_model.pth')
@@ -114,7 +142,6 @@ def train_model(config_path, resume_path = None):
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
-                'scheduler_state_dict': scheduler.state_dict(),
                 'acc': val_top1_acc,
                 'config': config,
             }, save_dir, f'checkpoint_epoch_{epoch}.pth')
@@ -124,7 +151,6 @@ def train_model(config_path, resume_path = None):
         'epoch': epochs,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-        'scheduler_state_dict': scheduler.state_dict(),
         'acc': best_top1_acc,
         'config': config, 
         }, 

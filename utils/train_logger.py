@@ -95,7 +95,7 @@ class Logger:
         gpu_percent_list = self.epoch_metrics['gpu_percent']
         cpu_percent_list = self.epoch_metrics['cpu_percent']
 
-        avg = lambda a_list : sum(a_list) / len(a_list)
+        avg = lambda a_list : sum(a_list) / max(1,len(a_list))
 
         return {
             'avg_gpu_mem_used_gb': avg(gpu_mem_list),
