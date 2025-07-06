@@ -46,9 +46,9 @@ class RepVGG_Block(nn.Module):
         self.infer = True
         self.infer_conv = self.combine_3_branch()
 
-        del self.conv_1x1_with_bn
-        del self.conv_3x3_with_bn
-        if hasattr(self,'id_with_bn') : del self.id_with_bn
+        self.conv_1x1_with_bn = None
+        self.conv_3x3_with_bn = None
+        if hasattr(self,'id_with_bn') : self.id_with_bn = None
 
     def combine_3_branch(self):
         weight_3x3, bias_3x3 = self.combine_conv_bn(self.conv_3x3_with_bn)
