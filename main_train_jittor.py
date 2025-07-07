@@ -15,7 +15,7 @@ def create_model(config):
         channel_scale_A=config['scale_a'],
         channel_scale_B=config['scale_b'],
         group_conv=config['group_conv'],
-        classify_classes=1000,  
+        classify_classes=config['num_classes'],  
         model_type=config['model_type']
     )
 

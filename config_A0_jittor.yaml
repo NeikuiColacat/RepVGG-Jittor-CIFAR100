@@ -3,6 +3,7 @@ model_type: "A"
 scale_a: 0.75
 scale_b: 2.5
 group_conv : 1
+num_classes : 1000
 
 data_path : "/root/autodl-tmp/imagenet"
 batch_size : 256 

@@ -57,8 +57,7 @@ def get_imagenet_dataloaders(config):
     return train_loader, val_loader
 
 
-
-def train_one_epoch(model: nn.Module, train_lodaer: DataLoader, optimizer: torch.optim.SGD, loss_func : nn.CrossEntropyLoss , epoch_idx , scaler):
+def train_one_epoch(model: nn.Module, train_lodaer: DataLoader, optimizer: torch.optim.SGD, loss_func: nn.CrossEntropyLoss, epoch_idx, scaler):
     model.train()
     cur_loss = 0.
     ok_num = 0
@@ -72,14 +71,21 @@ def train_one_epoch(model: nn.Module, train_lodaer: DataLoader, optimizer: torch
         data = data.to(memory_format=torch.channels_last)
         optimizer.zero_grad()
 
-        with torch.autocast(device_type='cuda'):
+        if scaler is not None: 
+            with torch.autocast(device_type='cuda'):
 
+                output = model(data)
+                loss = loss_func(output , target) 
+
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+        else :
             output = model(data)
-            loss = loss_func(output , target) 
+            loss = loss_func(output , target)
+            loss.backward()
+            optimizer.step()
 
-        scaler.scale(loss).backward()
-        scaler.step(optimizer)
-        scaler.update()
 
         cur_loss += loss.item()
         pred_tar = output.argmax(dim = 1)
@@ -100,7 +106,7 @@ def train_one_epoch(model: nn.Module, train_lodaer: DataLoader, optimizer: torch
 
 
 @torch.no_grad()
-def val_one_epoch(model:nn.Module,val_loader,loss_func:nn.CrossEntropyLoss):
+def val_one_epoch(model:nn.Module,val_loader,loss_func:nn.CrossEntropyLoss,USE_AMP):
     model.eval()
     cur_loss = 0.
     top1_ok_num = 0
@@ -113,11 +119,14 @@ def val_one_epoch(model:nn.Module,val_loader,loss_func:nn.CrossEntropyLoss):
         data , target = data.to(device,non_blocking=True) , target.to(device,non_blocking=True) ,
         data = data.to(memory_format=torch.channels_last) 
 
+        if USE_AMP :
+            with torch.autocast(device_type='cuda'):
+                output = model(data)
+                loss = loss_func(output, target)
+        else :
+            output = model(data) 
+            loss = loss_func(output , target)
 
-        with torch.autocast(device_type='cuda'):
-            output = model(data)
-            loss = loss_func(output, target)
-        
         cur_loss += loss.item()
         
         top1_num, top5_num = cal_topk_num(output, target , (1,5))

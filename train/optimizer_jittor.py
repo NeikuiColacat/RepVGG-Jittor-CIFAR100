@@ -11,13 +11,11 @@ def filter_param(model: nn.Module):
     for module in model.modules():
         if isinstance(module, (nn.Conv2d, nn.Linear)):
             weight_decay_param.append(module.weight)
-            if module.bias is not None :
-                no_decay_param.append(module.bias)
         else:
             no_decay_param += [p for p in module.parameters(recurse = False) if p.requires_grad]
     
     return [
-        {'params': weight_decay_param , 'weight_decay' : 1e-4},
+        {'params': weight_decay_param},
         {'params': no_decay_param, 'weight_decay': 0}
     ]
 
@@ -37,7 +35,7 @@ def get_optimizer(model, config):
 
 def get_scheduler(optimizer, config):
     epochs = config['epochs']
-    warmup_epochs = config['warmup_epochs']
+    # warmup_epochs = config['warmup_epochs']
     min_lr = config['min_lr']
     lr = config['lr']
 

@@ -11,12 +11,13 @@ from train.train_torch import get_imagenet_dataloaders, train_one_epoch, val_one
 from train.optimizer_torch import get_optimizer, get_scheduler
 from utils.train_logger import Logger
 
+
 def create_model(config):
     model = RepVGG_Model(
         channel_scale_A=config['scale_a'],
         channel_scale_B=config['scale_b'],
         group_conv=config['group_conv'],
-        classify_classes=1000,  
+        classify_classes=config['num_classes'],  
         model_type=config['model_type']
     )
     
@@ -28,14 +29,16 @@ def save_chk_point(state, save_dir, filename):
     torch.save(state, filepath)
 
 
-def load_chk_point(model, optimizer, scheduler, scaler,  checkpoint_path):
+def load_chk_point(model, optimizer, scheduler, scaler,  checkpoint_path , USE_AMP):
     assert(os.path.exists(checkpoint_path))
     checkpoint = torch.load(checkpoint_path)
     
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-    scaler.load_state_dict(checkpoint['scaler_state_dict'])
+
+    if USE_AMP:
+        scaler.load_state_dict(checkpoint['scaler_state_dict'])
     
     return checkpoint['epoch'], checkpoint['acc']
 
@@ -43,7 +46,9 @@ def train_model(config_path, resume_path = None):
     
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
-    
+
+    USE_AMP = config['use_amp'] 
+
     epochs = config['epochs']
     save_dir = config['chk_point_dir']
     model_name = config['model_name']
@@ -61,7 +66,11 @@ def train_model(config_path, resume_path = None):
     loss_func = nn.CrossEntropyLoss()
     start_epoch = 0
     best_top1_acc = 0.0
-    scaler = torch.amp.GradScaler("cuda")
+
+    if USE_AMP:
+        scaler = torch.amp.GradScaler("cuda")
+    else :
+        scaler = None
 
     logger = Logger(
         log_dir=config['log_dir'],
@@ -70,7 +79,20 @@ def train_model(config_path, resume_path = None):
     )
     
 
-    if resume_path: start_epoch, best_top1_acc = load_chk_point(model, optimizer, scheduler,scaler,resume_path)
+    if resume_path: 
+        start_epoch, best_top1_acc = load_chk_point(
+            model, optimizer, scheduler, scaler, resume_path, USE_AMP)
+    get_save_dict  = lambda : ({
+            'epoch' : epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'scheduler_state_dict': scheduler.state_dict(),
+            'acc': val_top1_acc,
+            'config': config,
+            'scaler_state_dict' : scaler.state_dict() if USE_AMP else None
+        }
+    )
+
     for epoch in range(start_epoch, epochs):
         
         logger.start_epoch_monitoring()
@@ -88,7 +110,8 @@ def train_model(config_path, resume_path = None):
         val_loss, val_top1_acc, val_top5_acc = val_one_epoch(
             model=model,
             val_loader=val_loader,
-            loss_func=loss_func
+            loss_func=loss_func,
+            USE_AMP=USE_AMP
         )
         
         scheduler.step()
@@ -108,39 +131,19 @@ def train_model(config_path, resume_path = None):
             learning_rate=cur_lr,
         )
         
+
         if val_top1_acc > best_top1_acc:
             best_top1_acc = val_top1_acc 
-            save_chk_point({
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'scheduler_state_dict': scheduler.state_dict(),
-                'acc': val_top1_acc,
-                'config': config,
-            }, save_dir, 'best_model.pth')
+            save_dict = get_save_dict()
+            save_chk_point(save_dict, save_dir, 'best_model.pth')
         
         if epoch % 5 == 0:
-            save_chk_point({
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'scheduler_state_dict': scheduler.state_dict(),
-                'acc': val_top1_acc,
-                'config': config,
-            }, save_dir, f'checkpoint_epoch_{epoch}.pth')
+            save_dict = get_save_dict()
+            save_chk_point(save_dict, save_dir, f'checkpoint_epoch_{epoch}.pth')
 
-    save_chk_point({
-        'epoch': epochs,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'scheduler_state_dict': scheduler.state_dict(),
-        'acc': best_top1_acc,
-        'config': config, 
-        'scaler_state_dict': scaler.state_dict(),  
-        }, 
-        save_dir, 
-        'final_model.pth'
-    )
+
+    save_dict = get_save_dict()
+    save_chk_point(save_dict,save_dir,'final_model.pth')
 
 
 def main():
@@ -166,8 +169,6 @@ if __name__ == "__main__":
     torch.manual_seed(LUCK_NUMBER)
     torch.cuda.manual_seed(LUCK_NUMBER)
     torch.cuda.manual_seed_all(LUCK_NUMBER)
-
-    torch.backends.cudnn.benchmark = True
 
     main()
     
