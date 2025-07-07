@@ -4,6 +4,8 @@ import os
 import sys
 import time
 import yaml
+import torchvision
+import torchvision.transforms as transforms
 from tqdm import tqdm
 
 from model.RepVGG_model_torch import RepVGG_Model
@@ -42,6 +44,31 @@ def load_chk_point(model, optimizer, scheduler, scaler,  checkpoint_path , USE_A
     
     return checkpoint['epoch'], checkpoint['acc']
 
+
+def get_cifar10_dataloaders(config):
+    batch_size = config.get('batch_size', 128)
+    num_workers = config.get('num_workers', 4)
+    data_path = config.get('data_path', './data')
+
+    transform_train = transforms.Compose([
+        transforms.RandomCrop(32, padding=4),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+    ])
+    transform_test = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+    ])
+
+    trainset = torchvision.datasets.CIFAR10(root=data_path, train=True, download=True, transform=transform_train)
+    train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+
+    testset = torchvision.datasets.CIFAR10(root=data_path, train=False, download=True, transform=transform_test)
+    val_loader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+
+    return train_loader, val_loader
+
 def train_model(config_path, resume_path = None):
     
     with open(config_path, 'r') as f:
@@ -61,7 +88,7 @@ def train_model(config_path, resume_path = None):
 
     optimizer = get_optimizer(model, config)
     scheduler = get_scheduler(optimizer, config)
-    train_loader, val_loader = get_imagenet_dataloaders(config)
+    train_loader, val_loader = get_cifar10_dataloaders(config)
 
     loss_func = nn.CrossEntropyLoss()
     start_epoch = 0
@@ -168,8 +195,6 @@ if __name__ == "__main__":
     torch.manual_seed(LUCK_NUMBER)
     torch.cuda.manual_seed(LUCK_NUMBER)
     torch.cuda.manual_seed_all(LUCK_NUMBER)
-
-    torch.set_float32_matmul_precision('high')
 
     main()
     

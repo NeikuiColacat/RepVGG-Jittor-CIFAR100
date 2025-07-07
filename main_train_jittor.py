@@ -9,6 +9,7 @@ from model.RepVGG_model_jittor import RepVGG_Model
 from train.train_jittor import get_imagenet_dataloaders , train_one_epoch , val_one_epoch
 from train.optimizer_jittor import get_optimizer, get_scheduler
 from utils.train_logger import Logger
+from jittor.dataset import CIFAR10
 
 def create_model(config):
     return RepVGG_Model(
@@ -64,6 +65,14 @@ def train_model(config_path, resume_path = None):
         start_epoch, best_top1_acc = load_chk_point(model, optimizer, resume_path)
         scheduler.last_epoch = start_epoch
 
+    get_save_dict  = lambda : ({
+            'epoch' : epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'acc': val_top1_acc,
+            'config': config,
+        }
+    )
     for epoch in range(start_epoch, epochs):
         
         logger.start_epoch_monitoring()
@@ -83,8 +92,8 @@ def train_model(config_path, resume_path = None):
             loss_func=loss_func
         )
         
+        cur_lr = optimizer.lr 
         scheduler.step()
-        cur_lr = optimizer.param_groups[0]['lr']
 
         
         epoch_time = time.time() - epoch_start_time
@@ -102,34 +111,13 @@ def train_model(config_path, resume_path = None):
         
         if val_top1_acc > best_top1_acc:
             best_top1_acc = val_top1_acc 
-            save_chk_point({
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'acc': val_top1_acc,
-                'config': config,
-            }, save_dir, 'best_model.pth')
+            save_chk_point(get_save_dict(), save_dir, 'best_model.pth')
         
         if epoch % 10 == 0:
-            save_chk_point({
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'acc': val_top1_acc,
-                'config': config,
-            }, save_dir, f'checkpoint_epoch_{epoch}.pth')
+            save_chk_point(get_save_dict(), save_dir, f'checkpoint_epoch_{epoch}.pth')
 
 
-    save_chk_point({
-        'epoch': epochs,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'acc': best_top1_acc,
-        'config': config, 
-        }, 
-        save_dir, 
-        'final_model.pth'
-    )
+    save_chk_point(get_save_dict(), save_dir, 'final_model.pth')
 
 
 def main():
