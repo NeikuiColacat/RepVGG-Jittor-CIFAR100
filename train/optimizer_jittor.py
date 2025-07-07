@@ -41,15 +41,16 @@ def get_scheduler(optimizer, config):
     min_lr = config['min_lr']
     lr = config['lr']
 
-    ratio = min_lr / lr
+    # ratio = min_lr / lr
 
-    def get_factor(epoch):
-        if epoch < warmup_epochs:
-            return max(epoch / warmup_epochs, ratio)
-        else:
-            scale = (epoch - warmup_epochs) / (epochs - warmup_epochs)
-            return ratio + (1 - ratio) / 2 * (1 + cos(pi * scale))
+    # def get_factor(epoch):
+    #     if epoch < warmup_epochs:
+    #         return max(epoch / warmup_epochs, ratio)
+    #     else:
+    #         scale = (epoch - warmup_epochs) / (epochs - warmup_epochs)
+    #         return ratio + (1 - ratio) / 2 * (1 + cos(pi * scale))
 
-    return optim.LambdaLR(optimizer, get_factor)
+    # return optim.LambdaLR(optimizer, get_factor)
 
+    return jt.lr_scheduler.CosineAnnealingLR(optimizer,epochs,eta_min=min_lr) 
 

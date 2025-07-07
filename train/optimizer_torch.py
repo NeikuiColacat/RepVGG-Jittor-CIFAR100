@@ -43,19 +43,20 @@ def get_optimizer(model,config):
 def get_scheduler(optimizer,config):
     
     epochs = config['epochs']
-    warmup_epochs = config['warmup_epochs']
     min_lr = config['min_lr']
     lr = config['lr']
 
-    ratio = min_lr / lr
+    # ratio = min_lr / lr
 
-    def get_factor(epoch):
-        if epoch < warmup_epochs:
-            return max(epoch / warmup_epochs , ratio)
-        else :
-            scale = (epoch - warmup_epochs) / (epochs - warmup_epochs)
-            return ratio + (1-ratio) / 2 * (1 + cos(pi * scale))
+    # def get_factor(epoch):
+    #     if epoch < warmup_epochs:
+    #         return max(epoch / warmup_epochs , ratio)
+    #     else :
+    #         scale = (epoch - warmup_epochs) / (epochs - warmup_epochs)
+    #         return ratio + (1-ratio) / 2 * (1 + cos(pi * scale))
 
-    return torch.optim.lr_scheduler.LambdaLR(optimizer, get_factor)
+    # return torch.optim.lr_scheduler.LambdaLR(optimizer, get_factor)
+
+    return torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,T_max=epochs,eta_min=min_lr)
 
     

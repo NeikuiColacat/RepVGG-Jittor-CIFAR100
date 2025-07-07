@@ -71,7 +71,6 @@ Thumbs.db
 
 # ✅ Conda 环境文件（可选）
 *.conda
-*.yaml
 
 # ✅ Colab & Kaggle 特有
 *.ipynb

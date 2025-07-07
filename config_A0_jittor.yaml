@@ -1,4 +1,4 @@
-model_name : "RepVGG_Torch_A0"
+model_name : "RepVGG_Jittor_A0"
 model_type: "A"
 scale_a: 0.75
 scale_b: 2.5
@@ -10,11 +10,11 @@ image_size : 224
 
 epochs : 120
 lr : 0.1
+# warmup_epochs : 5 
 weight_decay : 0.0001 
 momentum : 0.9
 num_workers : 16
-# warmup_epochs : 5
 min_lr : 0.00001 
 
-chk_point_dir : ./chk_points/torch_A0
-log_dir : ./logs/torch_A0
+chk_point_dir : ./chk_points/jittor_A0
+log_dir : ./logs/jittor_A0
