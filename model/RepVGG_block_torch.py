@@ -15,18 +15,22 @@ class RepVGG_Block(nn.Module):
         self.id_with_bn = None 
         self.use_identity = (in_channels == out_channels and stride == 1)
 
-        get_conv_with_bn = lambda kernel_size , padding : nn.Sequential(
-            nn.Conv2d(
+
+        def get_conv_with_bn(kernel_size, padding):
+            conv = nn.Conv2d(
                 in_channels,
                 out_channels,
                 kernel_size,
-                stride = stride,
+                stride=stride,
                 padding=padding,
                 groups=conv_group,
                 bias=False,
-            ),
-            nn.BatchNorm2d(out_channels),
-        )
+            )
+            bn = nn.BatchNorm2d(out_channels)
+
+            nn.init.kaiming_uniform_(conv.weight,mode='fan_out',nonlinearity='relu')
+
+            return nn.Sequential(conv,bn)
         
         if self.use_identity : self.id_with_bn= nn.BatchNorm2d(in_channels)
         self.conv_1x1_with_bn = get_conv_with_bn(1,0)

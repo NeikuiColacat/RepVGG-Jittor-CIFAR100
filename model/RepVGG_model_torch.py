@@ -34,6 +34,9 @@ class RepVGG_Model(nn.Module):
         self.pool = nn.AdaptiveAvgPool2d(1)
         self.linear = nn.Linear(int(channel_scale_B * 512) , self.classify_classes)
 
+        nn.init.xavier_uniform_(self.linear.weight)
+        nn.init.zeros_(self.linear.bias)
+
     def get_a_stage(self, channels_size, blocks_size):
         res = []
         for i in range(blocks_size):

@@ -16,18 +16,21 @@ class RepVGG_Block(nn.Module):
         self.id_with_bn = None
 
         def get_conv_with_bn(kernel_size, padding):
-            return nn.Sequential(
-                nn.Conv2d(
-                    in_channels,
-                    out_channels,
-                    kernel_size,
-                    stride=stride,
-                    padding=padding,
-                    groups=conv_group,
-                    bias=False,
-                ),
-                nn.BatchNorm2d(out_channels),
+            conv = nn.Conv2d(
+                in_channels,
+                out_channels,
+                kernel_size,
+                stride=stride,
+                padding=padding,
+                groups=conv_group,
+                bias=False,
             )
+            bn = nn.BatchNorm2d(out_channels)
+
+            init.kaiming_uniform_(conv.weight,mode='fan_out',nonlinearity='relu')
+
+            return nn.Sequential(conv,bn)
+            
         
         if self.use_identity:
             self.id_with_bn = nn.BatchNorm2d(in_channels)
@@ -60,7 +63,6 @@ class RepVGG_Block(nn.Module):
         weight_3x3, bias_3x3 = self.combine_conv_bn(self.conv_3x3_with_bn)
         weight_1x1, bias_1x1 = self.combine_conv_bn(self.conv_1x1_with_bn)
 
-        # Jittor 中使用 jt.nn.pad 进行填充
         weight_1x1 = jt.nn.pad(weight_1x1, [1, 1, 1, 1])
 
         new_weight = weight_3x3 + weight_1x1

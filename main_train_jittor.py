@@ -145,7 +145,7 @@ def main():
 if __name__ == "__main__":
 
     LUCK_NUMBER = 998244353
-    jt.seed(LUCK_NUMBER)
+    jt.misc.set_global_seed(LUCK_NUMBER)
     jt.flags.use_cuda = 1
 
     main()
