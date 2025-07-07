@@ -13,6 +13,12 @@ from utils.train_logger import Logger
 
 
 def create_model(config):
+
+    if config['model_name'] == 'baseline':
+        import torchvision.models as models
+        return models.resnet18(pretrained=False, num_classes=1000)
+
+
     model = RepVGG_Model(
         channel_scale_A=config['scale_a'],
         channel_scale_B=config['scale_b'],

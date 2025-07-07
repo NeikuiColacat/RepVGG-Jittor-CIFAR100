@@ -7,10 +7,10 @@ num_classes : 1000
 
 
 data_path : "/root/autodl-tmp/imagenet"
-batch_size : 256 
+batch_size : 192 
 image_size : 224
 
-epochs : 120
+epochs : 5 
 lr : 0.1
 weight_decay : 0.0001 
 momentum : 0.9
@@ -20,5 +20,5 @@ min_lr : 0.00001
 
 use_amp : false
 
-chk_point_dir : ./chk_points/torch_A0
-log_dir : ./logs/torch_A0
+chk_point_dir : /root/autodl-tmp/chk_points/torch_A0
+log_dir : /root/autodl-tmp/logs/torch_A0

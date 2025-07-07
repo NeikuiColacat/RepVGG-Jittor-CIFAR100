@@ -9,9 +9,14 @@ from model.RepVGG_model_jittor import RepVGG_Model
 from train.train_jittor import get_imagenet_dataloaders , train_one_epoch , val_one_epoch
 from train.optimizer_jittor import get_optimizer, get_scheduler
 from utils.train_logger import Logger
-from jittor.dataset import CIFAR10
+from jittor.models import resnet18
 
 def create_model(config):
+
+    if config['model_name'] == 'baseline':
+        return resnet18(False)
+
+
     return RepVGG_Model(
         channel_scale_A=config['scale_a'],
         channel_scale_B=config['scale_b'],
