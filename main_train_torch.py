@@ -7,8 +7,8 @@ import yaml
 from tqdm import tqdm
 
 from model.RepVGG_model_torch import RepVGG_Model
-from train.data_loader_torch import get_imagenet_dataloaders, train_one_epoch, val_one_epoch
-from train.data_loader_torch import get_cifar100_dataloaders
+from train.train_torch import  train_one_epoch, val_one_epoch
+from train.data_loader_torch import get_cifar100_dataloaders , get_imagenet_dataloaders
 from train.optimizer_torch import get_optimizer, get_scheduler
 from utils.train_logger import Logger
 
