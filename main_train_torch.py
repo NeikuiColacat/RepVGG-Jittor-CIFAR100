@@ -1,9 +1,11 @@
 import torch
 import torch.nn as nn
+import numpy as np
 import os
 import sys
 import time
 import yaml
+import random
 from tqdm import tqdm
 
 from model.RepVGG_model_torch import RepVGG_Model
@@ -177,6 +179,9 @@ def main():
 if __name__ == "__main__":
 
     LUCK_NUMBER = 998244353
+
+    random.seed(LUCK_NUMBER)
+    np.random.seed(LUCK_NUMBER)    
     torch.manual_seed(LUCK_NUMBER)
     torch.cuda.manual_seed(LUCK_NUMBER)
     torch.cuda.manual_seed_all(LUCK_NUMBER)
