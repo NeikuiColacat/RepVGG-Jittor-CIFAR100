@@ -152,6 +152,8 @@ if __name__ == "__main__":
     LUCK_NUMBER = 998244353
     jt.misc.set_global_seed(LUCK_NUMBER)
     jt.flags.use_cuda = 1
+    jt.flags.use_tensorcore = 1
+    jt.flags.auto_mixed_precision_level = 5
 
     main()
     

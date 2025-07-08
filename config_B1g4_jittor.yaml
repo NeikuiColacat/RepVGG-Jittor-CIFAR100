@@ -11,11 +11,11 @@ data_path : "/root/autodl-tmp/cifar100jittor"
 batch_size: 128 
 image_size: 224
 
-epochs : 5 
+epochs : 200 
 lr : 0.1
 weight_decay : 0.0001 
 momentum : 0.9
-num_workers : 16
+num_workers : 12
 # warmup_epochs : 5
 min_lr : 0.00001 
 
