@@ -7,6 +7,7 @@ import yaml
 from tqdm import tqdm
 from model.RepVGG_model_jittor import RepVGG_Model 
 from train.train_jittor import get_imagenet_dataloaders , train_one_epoch , val_one_epoch
+from train.data_loader_jittor import get_cifar100_dataloaders
 from train.optimizer_jittor import get_optimizer, get_scheduler
 from utils.train_logger import Logger
 from jittor.models import resnet18
@@ -53,7 +54,11 @@ def train_model(config_path, resume_path = None):
 
     optimizer = get_optimizer(model, config)
     scheduler = get_scheduler(optimizer, config)
-    train_loader, val_loader = get_imagenet_dataloaders(config)
+
+    if 'cifar' in config['data_path']:
+        train_loader, val_loader = get_cifar100_dataloaders(config)
+    else :
+        train_loader, val_loader = get_imagenet_dataloaders(config)
 
     loss_func = nn.CrossEntropyLoss()
     start_epoch = 0

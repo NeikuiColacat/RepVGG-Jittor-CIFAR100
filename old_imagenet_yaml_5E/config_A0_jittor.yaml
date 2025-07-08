@@ -3,10 +3,10 @@ model_type: "A"
 scale_a: 0.75
 scale_b: 2.5
 group_conv : 1
-num_classes : 100 
+num_classes : 1000
 
-data_path : "/root/autodl-tmp/cifar100jittor"
-batch_size : 128 
+data_path : "/root/autodl-tmp/imagenet"
+batch_size : 192 
 image_size : 224
 
 epochs : 5 
@@ -17,5 +17,5 @@ momentum : 0.9
 num_workers : 16
 min_lr : 0.00001 
 
-chk_point_dir : /root/autodl-tmp/chk_points/jittor_A0_cifar
-log_dir : /root/autodl-tmp/logs/jittor_A0_cifar
+chk_point_dir : /root/autodl-tmp/chk_points/jittor_A0
+log_dir : /root/autodl-tmp/logs/jittor_A0

@@ -6,7 +6,7 @@ model_name : "baseline"
 # num_classes : 1000
 
 
-data_path : "/root/autodl-tmp/cifar100torch"
+data_path : "/root/autodl-tmp/imagenet"
 batch_size : 192 
 image_size : 224
 

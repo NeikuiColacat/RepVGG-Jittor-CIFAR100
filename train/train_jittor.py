@@ -66,12 +66,10 @@ def train_one_epoch(model: nn.Module, train_loader, optimizer, loss_func, epoch_
 
     for batch_idx, (data, target) in enumerate(process_bar):
         
-        optimizer.zero_grad()
         output = model(data)
         loss = loss_func(output, target)
 
-        optimizer.backward(loss)
-        optimizer.step()
+        optimizer.step(loss)
 
         cur_loss += loss.item()
         pred = jt.argmax(output, dim=1)[0]

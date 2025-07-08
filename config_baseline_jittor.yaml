@@ -5,7 +5,8 @@ model_name : "baseline"
 # group_conv : 1
 # num_classes : 1000
 
-data_path : "/root/autodl-tmp/imagenet"
+data_path : "/root/autodl-tmp/cifar100jittor"
+
 batch_size : 192 
 image_size : 224
 
