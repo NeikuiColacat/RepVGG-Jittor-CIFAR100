@@ -1,4 +1,4 @@
-model_name : "RepVGG_Torch_A0"
+model_name : "RepVGG_Torch_A0_cifar"
 model_type: "A"
 scale_a: 0.75
 scale_b: 2.5
@@ -7,15 +7,14 @@ num_classes : 100
 
 
 data_path : "/root/autodl-tmp/cifar100torch"
-batch_size : 256 
+batch_size : 128 
 image_size : 224
 
-epochs : 120 
+epochs : 200 
 lr : 0.1
 weight_decay : 0.0001 
 momentum : 0.9
-num_workers : 16
-# warmup_epochs : 5
+num_workers : 12
 min_lr : 0.00001 
 
 use_amp : false
