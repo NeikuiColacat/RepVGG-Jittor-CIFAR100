@@ -43,13 +43,15 @@ def get_imagenet_dataloaders(config):
     train_loader = train_dataset.set_attrs(
         batch_size=batch_size, 
         shuffle=True,
-        num_workers=num_workers
+        num_workers=num_workers,
+        buffer_size = 1024 ** 3 * 2
     )
 
     val_loader = val_dataset.set_attrs(
         batch_size=batch_size, 
         shuffle=False,
-        num_workers=num_workers
+        num_workers=num_workers,
+        buffer_size = 1024 ** 3 * 2
     )
     
     return train_loader, val_loader
@@ -96,8 +98,8 @@ def get_cifar100_dataloaders(config):
     )
 
     train_loader = train_dataset.set_attrs(
-        batch_size=batch_size, shuffle=True, num_workers=num_workers)
+        batch_size=batch_size, shuffle=True, num_workers=num_workers,buffer_size=1024**3 * 2)
     val_loader = val_dataset.set_attrs(
-        batch_size=batch_size, shuffle=False, num_workers=num_workers)
+        batch_size=batch_size, shuffle=False, num_workers=num_workers,buffer_size = 1024**3*2)
 
     return train_loader, val_loader 
