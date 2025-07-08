@@ -4,19 +4,24 @@ from jittor import optim
 import yaml
 from math import cos, pi
 
-def filter_param(model: nn.Module):
+def filter_param(model:nn.Module):
     weight_decay_param = []
     no_decay_param = []
 
+    get_param_list = lambda module : [
+        param for param in module.parameters(False)
+        if param.requires_grad
+    ]
+
     for module in model.modules():
-        if isinstance(module, (nn.Conv2d, nn.Linear)):
-            weight_decay_param.append(module.weight)
-        else:
-            no_decay_param += [p for p in module.parameters(recurse = False) if p.requires_grad]
+        if isinstance(module , (nn.Conv2d,nn.Linear)) : 
+            weight_decay_param = weight_decay_param + get_param_list(module)
+        else :
+            no_decay_param = no_decay_param + get_param_list(module)
     
     return [
-        {'params': weight_decay_param},
-        {'params': no_decay_param, 'weight_decay': 0}
+        {'params':weight_decay_param},
+        {'params':no_decay_param,'weight_decay':0.}
     ]
 
 def get_optimizer(model, config):
