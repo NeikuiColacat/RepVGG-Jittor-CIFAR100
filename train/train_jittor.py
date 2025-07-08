@@ -15,9 +15,7 @@ def train_one_epoch(model: nn.Module, train_loader, optimizer, loss_func, epoch_
     tt = 0
     
     process_bar = tqdm(train_loader, desc=f'epoch {epoch_idx} training')
-
     for batch_idx, (data, target) in enumerate(process_bar):
-        
         output = model(data)
         loss = loss_func(output, target)
 
@@ -35,7 +33,7 @@ def train_one_epoch(model: nn.Module, train_loader, optimizer, loss_func, epoch_
                 'acc': f'{acc:.2f}%',
             })
     
-    train_loss = cur_loss / len(train_loader)
+    train_loss = cur_loss / (batch_idx + 1) 
     train_acc = ok_num / tt * 100
 
     return  train_loss , train_acc 
@@ -49,7 +47,9 @@ def val_one_epoch(model: nn.Module, val_loader, loss_func):
     tt = 0
 
     process_bar = tqdm(val_loader, desc='validating')
+    batch_cnt = 0
     for data, target in process_bar:
+        batch_cnt += 1
         output = model(data)
         loss = loss_func(output, target)
         
@@ -68,7 +68,7 @@ def val_one_epoch(model: nn.Module, val_loader, loss_func):
             'Top5': f'{cur_t5:.2f}%'
         })
     
-    cur_loss /= len(val_loader)
+    cur_loss /= batch_cnt 
     top1_acc = top1_ok_num / tt * 100.0
     top5_acc = top5_ok_num / tt * 100.0
 
