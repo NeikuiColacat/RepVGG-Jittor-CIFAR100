@@ -7,54 +7,6 @@ import os
 
 jt.flags.use_cuda = 1
 
-def get_imagenet_dataloaders(config):
-    data_path = config['data_path']
-    batch_size = config['batch_size']
-    img_size = config['image_size']
-    
-    train_transform = transform.Compose([
-        transform.RandomResizedCrop(img_size),
-        transform.RandomHorizontalFlip(0.5),
-        transform.ToTensor(),
-        transform.ImageNormalize(
-            mean=[0.485, 0.456, 0.406], 
-            std=[0.229, 0.224, 0.225]
-        ),
-    ])
-
-    val_transform = transform.Compose([
-        transform.Resize(256),
-        transform.CenterCrop(img_size),
-        transform.ToTensor(),
-        transform.ImageNormalize(
-            mean=[0.485, 0.456, 0.406], 
-            std=[0.229, 0.224, 0.225]
-        )
-    ])
-    
-    train_dataset = ImageFolder(
-        os.path.join(data_path, "train"), 
-        transform=train_transform
-    )
-    val_dataset = ImageFolder(
-        os.path.join(data_path, "val"), 
-        transform=val_transform
-    )
-    
-    num_workers = config['num_workers']
-    train_loader = train_dataset.set_attrs(
-        batch_size=batch_size, 
-        shuffle=True,
-        num_workers=num_workers
-    )
-
-    val_loader = val_dataset.set_attrs(
-        batch_size=batch_size, 
-        shuffle=False,
-        num_workers=num_workers
-    )
-    
-    return train_loader, val_loader
 
 def train_one_epoch(model: nn.Module, train_loader, optimizer, loss_func, epoch_idx):
     model.train()

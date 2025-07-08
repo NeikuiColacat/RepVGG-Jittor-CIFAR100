@@ -10,52 +10,6 @@ import yaml
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def get_imagenet_dataloaders(config):
-    
-    data_path = config['data_path']
-    batch_size = config['batch_size']
-    img_size = config['image_size']
-    
-    train_transform = transforms.Compose([
-        transforms.RandomResizedCrop(img_size),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
-
-    val_transform = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(img_size),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
-    
-    train_dataset = datasets.ImageFolder(f"{data_path}/train", transform=train_transform)
-    val_dataset = datasets.ImageFolder(f"{data_path}/val", transform=val_transform)
-    
-    num_workers = config['num_workers']
-    train_loader = DataLoader(
-        train_dataset, 
-        batch_size=batch_size, 
-        shuffle=True, 
-        num_workers=num_workers,
-        pin_memory=True,
-        persistent_workers=True,
-        prefetch_factor=4
-    )
-
-    val_loader = DataLoader(
-        val_dataset, 
-        batch_size=batch_size, 
-        shuffle=False, 
-        num_workers=num_workers,
-        pin_memory=True,
-        persistent_workers=True,
-        prefetch_factor=4
-    )
-    
-    return train_loader, val_loader
-
 
 def train_one_epoch(model: nn.Module, train_lodaer: DataLoader, optimizer: torch.optim.SGD, loss_func: nn.CrossEntropyLoss, epoch_idx, scaler):
     model.train()

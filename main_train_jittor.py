@@ -6,7 +6,7 @@ import time
 import yaml
 from tqdm import tqdm
 from model.RepVGG_model_jittor import RepVGG_Model 
-from train.train_jittor import get_imagenet_dataloaders , train_one_epoch , val_one_epoch
+from train.data_loader_jittor import get_imagenet_dataloaders , train_one_epoch , val_one_epoch
 from train.data_loader_jittor import get_cifar100_dataloaders
 from train.optimizer_jittor import get_optimizer, get_scheduler
 from utils.train_logger import Logger
