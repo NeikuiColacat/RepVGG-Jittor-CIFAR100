@@ -74,5 +74,4 @@ Thumbs.db
 
 # ✅ Colab & Kaggle 特有
 *.ipynb
-*.yaml
 
