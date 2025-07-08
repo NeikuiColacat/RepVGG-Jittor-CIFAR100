@@ -12,23 +12,24 @@ from train.data_loader_torch import get_cifar100_dataloaders , get_imagenet_data
 from train.optimizer_torch import get_optimizer, get_scheduler
 from utils.train_logger import Logger
 
-
 def create_model(config):
 
-    if config['model_name'] == 'baseline':
-        import torchvision.models as models
-        return models.resnet18(pretrained=False, num_classes=1000)
+    model_name = config['model_name']
+    if 'resnet' in model_name :
+        import torchvision.models as models 
+        if 'cifar' in model_name:
+            return models.resnet18(pretrained=False, num_classes=100)  
+        else :
+            return models.resnet18(pretrained=False, num_classes=1000)
 
-
-    model = RepVGG_Model(
-        channel_scale_A=config['scale_a'],
-        channel_scale_B=config['scale_b'],
-        group_conv=config['group_conv'],
-        classify_classes=config['num_classes'],  
-        model_type=config['model_type']
-    )
-    
-    return model
+    else:
+        return RepVGG_Model(
+            channel_scale_A=config['scale_a'],
+            channel_scale_B=config['scale_b'],
+            group_conv=config['group_conv'],
+            classify_classes=config['num_classes'],
+            model_type=config['model_type']
+        )
 
 def save_chk_point(state, save_dir, filename):
     os.makedirs(save_dir, exist_ok=True)

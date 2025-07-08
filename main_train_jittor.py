@@ -14,17 +14,18 @@ from jittor.models import resnet18
 
 def create_model(config):
 
-    if config['model_name'] == 'baseline':
-        return resnet18(False)
+    model_name = config['model_name']
+    if 'resnet' in model_name :
+        return resnet18(False,num_classes = 100) if 'cifar' in model_name else resnet18(False,num_classes=1000)
 
-
-    return RepVGG_Model(
-        channel_scale_A=config['scale_a'],
-        channel_scale_B=config['scale_b'],
-        group_conv=config['group_conv'],
-        classify_classes=config['num_classes'],  
-        model_type=config['model_type']
-    )
+    else:
+        return RepVGG_Model(
+            channel_scale_A=config['scale_a'],
+            channel_scale_B=config['scale_b'],
+            group_conv=config['group_conv'],
+            classify_classes=config['num_classes'],
+            model_type=config['model_type']
+        )
 
 def save_chk_point(state, save_dir, filename):
     os.makedirs(save_dir, exist_ok=True)
@@ -153,7 +154,6 @@ if __name__ == "__main__":
     jt.misc.set_global_seed(LUCK_NUMBER)
     jt.flags.use_cuda = 1
     jt.flags.use_tensorcore = 1
-    jt.flags.auto_mixed_precision_level = 5
 
     main()
     
