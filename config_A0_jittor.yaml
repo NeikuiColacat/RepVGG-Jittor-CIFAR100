@@ -7,7 +7,7 @@ num_classes : 100
 
 
 data_path : "/root/autodl-tmp/cifar100jittor"
-batch_size : 128 
+batch_size : 512 
 image_size : 32 
 
 epochs : 200 
