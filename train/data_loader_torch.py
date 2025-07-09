@@ -54,15 +54,15 @@ def get_cifar100_dataloaders(config):
     img_size = config['image_size']
     
     train_transform = transforms.Compose([
-        transforms.RandomResizedCrop(img_size),
+        transforms.RandomCrop(img_size,padding=4),
+        transforms.Resize(img_size),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5071, 0.4867, 0.4408], std=[0.2675, 0.2565, 0.2761]),
     ])
 
     val_transform = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(img_size),
+        transforms.Resize(img_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5071, 0.4867, 0.4408], std=[0.2675, 0.2565, 0.2761])
     ])

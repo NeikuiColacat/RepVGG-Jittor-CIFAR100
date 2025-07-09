@@ -57,13 +57,27 @@ def get_imagenet_dataloaders(config):
     return train_loader, val_loader
 
 
+from PIL import ImageOps
+from jittor import transform
+
+class PadThenCrop:
+    def __init__(self, padding, crop_size):
+        self.padding = padding
+        self.crop_size = crop_size
+        self.crop = transform.RandomCrop(crop_size)
+
+    def __call__(self, img):
+        img = ImageOps.expand(img, border=self.padding, fill=0)
+        return self.crop(img)
+
 def get_cifar100_dataloaders(config):
     batch_size = config['batch_size']
     img_size = config['image_size']
     
     train_transform = transform.Compose([
-        transform.RandomResizedCrop(img_size),
-        transform.RandomHorizontalFlip(0.5),
+        PadThenCrop(4,32),
+        transform.Resize(img_size),
+        transform.RandomHorizontalFlip(),
         transform.ToTensor(),
         transform.ImageNormalize(
             mean=[0.5071, 0.4867, 0.4408], 
@@ -72,8 +86,7 @@ def get_cifar100_dataloaders(config):
     ])
 
     val_transform = transform.Compose([
-        transform.Resize(256),
-        transform.CenterCrop(img_size),
+        transform.Resize(img_size),
         transform.ToTensor(),
         transform.ImageNormalize(
             mean=[0.5071, 0.4867, 0.4408], 
