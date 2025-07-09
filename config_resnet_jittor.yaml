@@ -8,7 +8,7 @@ model_name : "resnet_jittor_cifar"
 
 data_path : "/root/autodl-tmp/cifar100jittor"
 batch_size : 128 
-image_size : 224
+image_size : 32 
 
 epochs : 200 
 lr : 0.1

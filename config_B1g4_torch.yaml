@@ -9,7 +9,7 @@ num_classes : 100
 data_path : "/root/autodl-tmp/cifar100torch"
 
 batch_size: 128
-image_size: 224
+image_size: 32 
 
 epochs : 200 
 lr : 0.1

@@ -9,6 +9,7 @@ for config_file in *.yaml; do
         echo "skip"
         # python main_train_torch.py --config "$config_file"
     else
-        python main_train_jittor.py --config "$config_file"
+        # python main_train_jittor.py --config "$config_file"
+        echo "skip"
     fi
 done
