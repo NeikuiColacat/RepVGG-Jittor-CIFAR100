@@ -10,12 +10,13 @@ from train.data_loader_jittor import get_cifar100_dataloaders , get_imagenet_dat
 from train.optimizer_jittor import get_optimizer, get_scheduler
 from utils.train_logger import Logger
 from jittor.models import resnet18
+import model.ResNet_model_jittor
 
 def create_model(config):
 
     model_name = config['model_name']
     if 'resnet' in model_name :
-        return resnet18(False,num_classes = 100) if 'cifar' in model_name else resnet18(False,num_classes=1000)
+        return model.ResNet_model_jittor.resnet18()
 
     else:
         return RepVGG_Model(
