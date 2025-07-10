@@ -15,7 +15,7 @@ def filter_param(model:nn.Module):
 
     for module in model.modules():
         if isinstance(module , (nn.Conv2d,nn.Linear)) : 
-            weight_decay_param = weight_decay_param + get_param_list(module)
+            weight_decay_param.append(module.weight)
         else :
             no_decay_param = no_decay_param + get_param_list(module)
     
@@ -40,20 +40,20 @@ def get_optimizer(model, config):
 
 def get_scheduler(optimizer, config):
     epochs = config['epochs']
-    # warmup_epochs = config['warmup_epochs']
     min_lr = config['min_lr']
     lr = config['lr']
+    warmup_epochs = 20 
 
-    # ratio = min_lr / lr
+    ratio = min_lr / lr
 
-    # def get_factor(epoch):
-    #     if epoch < warmup_epochs:
-    #         return max(epoch / warmup_epochs, ratio)
-    #     else:
-    #         scale = (epoch - warmup_epochs) / (epochs - warmup_epochs)
-    #         return ratio + (1 - ratio) / 2 * (1 + cos(pi * scale))
+    def get_factor(epoch):
+        if epoch < warmup_epochs:
+            return max(epoch / warmup_epochs, ratio)
+        else:
+            scale = (epoch - warmup_epochs) / (epochs - warmup_epochs)
+            return ratio + (1 - ratio) / 2 * (1 + cos(pi * scale))
 
-    # return optim.LambdaLR(optimizer, get_factor)
+    return optim.LambdaLR(optimizer, get_factor)
 
-    return jt.lr_scheduler.CosineAnnealingLR(optimizer,epochs,eta_min=min_lr) 
+    # return jt.lr_scheduler.CosineAnnealingLR(optimizer,epochs,eta_min=min_lr) 
 

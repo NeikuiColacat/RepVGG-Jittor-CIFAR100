@@ -10,12 +10,12 @@ data_path : "/root/autodl-tmp/cifar100jittor"
 batch_size : 512 
 image_size : 32 
 
-epochs : 200 
-lr : 0.1
-weight_decay : 0.0001 
+epochs : 250 
+lr : 0.4
+weight_decay : 0.0005
 momentum : 0.9
 num_workers : 12
-min_lr : 0.00001 
+min_lr : 0.000001 
 
 use_amp : false
 

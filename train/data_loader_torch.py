@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision import transforms
+import numpy as np
 
 def get_imagenet_dataloaders(config):
     
@@ -54,6 +55,7 @@ def get_cifar100_dataloaders(config):
     img_size = config['image_size']
     
     train_transform = transforms.Compose([
+        transforms.RandAugment(),
         transforms.RandomCrop(img_size,padding=4),
         transforms.Resize(img_size),
         transforms.RandomHorizontalFlip(),

@@ -18,13 +18,17 @@ def create_model(config):
 
     model_name = config['model_name']
     if 'resnet' in model_name :
-        import torchvision.models as models 
-        if 'cifar' in model_name:
-            return models.resnet18(pretrained=False, num_classes=100)  
-        else :
-            return models.resnet18(pretrained=False, num_classes=1000)
+        # import torchvision.models as models 
+        # if 'cifar' in model_name:
+        #     return models.resnet18(pretrained=False, num_classes=100)  
+        # else :
+        #     return models.resnet18(pretrained=False, num_classes=1000)
+        from model import ResNet_model_torch
+        return ResNet_model_torch.resnet18()
 
     else:
+        # import model.tmp_model 
+        # return model.tmp_model.create_RepVGG_A0(num_classes=100)
         return RepVGG_Model(
             channel_scale_A=config['scale_a'],
             channel_scale_B=config['scale_b'],
@@ -66,8 +70,6 @@ def train_model(config_path, resume_path = None):
 
     model = create_model(config)
     model = model.to(device)
-    model.to(memory_format = torch.channels_last)
-    model = torch.compile(model)
 
     optimizer = get_optimizer(model, config)
     scheduler = get_scheduler(optimizer, config)
@@ -77,7 +79,7 @@ def train_model(config_path, resume_path = None):
     else :
         train_loader, val_loader = get_imagenet_dataloaders(config)
 
-    loss_func = nn.CrossEntropyLoss()
+    loss_func = nn.CrossEntropyLoss(label_smoothing=0.1)
     start_epoch = 0
     best_top1_acc = 0.0
 
@@ -128,8 +130,8 @@ def train_model(config_path, resume_path = None):
             USE_AMP=USE_AMP
         )
 
-        cur_lr = optimizer.param_groups[0]['lr']
         scheduler.step()
+        cur_lr = optimizer.param_groups[0]['lr']
         
         epoch_time = time.time() - epoch_start_time
         

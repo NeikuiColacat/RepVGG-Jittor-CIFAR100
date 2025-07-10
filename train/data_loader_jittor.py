@@ -3,6 +3,7 @@ import jittor.nn as nn
 from jittor.dataset import ImageFolder
 import jittor.transform as transform
 from jittor.dataset.cifar import CIFAR100
+from torchvision import transforms
 import os
 
 def get_imagenet_dataloaders(config):
@@ -75,7 +76,8 @@ def get_cifar100_dataloaders(config):
     img_size = config['image_size']
     
     train_transform = transform.Compose([
-        PadThenCrop(4,img_size),
+        transforms.RandAugment(),
+        transforms.RandomCrop(32,padding=4),
         transform.Resize(img_size),
         transform.RandomHorizontalFlip(),
         transform.ToTensor(),
@@ -111,8 +113,8 @@ def get_cifar100_dataloaders(config):
     )
 
     train_loader = train_dataset.set_attrs(
-        batch_size=batch_size, shuffle=True, num_workers=num_workers,buffer_size=1024**3*2)
+        batch_size=batch_size, shuffle=True, num_workers=num_workers,buffer_size=1024**3)
     val_loader = val_dataset.set_attrs(
-        batch_size=batch_size, shuffle=False, num_workers=num_workers,buffer_size = 1024**3*2)
+        batch_size=batch_size, shuffle=False, num_workers=num_workers,buffer_size=1024**3)
 
     return train_loader, val_loader 

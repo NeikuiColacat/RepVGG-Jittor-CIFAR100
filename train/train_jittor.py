@@ -1,12 +1,10 @@
 import jittor as jt
 import jittor.nn as nn
-from jittor.dataset import ImageFolder
-import jittor.transform as transform
 from tqdm import tqdm
-import os
+import numpy as np
+
 
 jt.flags.use_cuda = 1
-
 
 def train_one_epoch(model: nn.Module, train_loader, optimizer, loss_func, epoch_idx):
     model.train()
@@ -16,8 +14,11 @@ def train_one_epoch(model: nn.Module, train_loader, optimizer, loss_func, epoch_
     
     process_bar = tqdm(train_loader, desc=f'epoch {epoch_idx} training')
     for batch_idx, (data, target) in enumerate(process_bar):
+        
+        # input , tar_a , tar_b , lam = mixup_data(data,target)
         output = model(data)
-        loss = loss_func(output, target)
+        # loss = mixup_loss_func(loss_func,output,tar_a,tar_b,lam)
+        loss = loss_func(output , target)
 
         optimizer.step(loss)
 

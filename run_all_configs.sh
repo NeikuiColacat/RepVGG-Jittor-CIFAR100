@@ -6,10 +6,8 @@ rm -r /root/autodl-tmp/chk_points
 
 for config_file in *.yaml; do
     if [[ $config_file == *torch* ]]; then
-        echo "skip"
-        # python main_train_torch.py --config "$config_file"
+        python main_train_torch.py --config "$config_file"
     else
-        # python main_train_jittor.py --config "$config_file"
-        echo "skip"
+        python main_train_jittor.py --config "$config_file"
     fi
 done

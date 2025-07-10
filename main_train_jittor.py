@@ -4,7 +4,6 @@ import os
 import time
 
 import yaml
-from tqdm import tqdm
 from model.RepVGG_model_jittor import RepVGG_Model 
 from train.train_jittor import train_one_epoch , val_one_epoch
 from train.data_loader_jittor import get_cifar100_dataloaders , get_imagenet_dataloaders
@@ -42,6 +41,21 @@ def load_chk_point(model, optimizer, checkpoint_path):
 
     return checkpoint['epoch'], checkpoint.get('acc', 0.0)
 
+class LabelSmoothingCrossEntropy(nn.Module):
+    def __init__(self, smoothing=0.1):
+        super().__init__()
+        self.smoothing = smoothing
+
+    def execute(self, pred, target):
+        n_class = pred.shape[1]
+        log_probs = nn.log_softmax(pred, dim=1)
+        with jt.no_grad():
+            true_dist = jt.zeros_like(pred)
+            true_dist += self.smoothing / (n_class - 1)
+            fill_value = jt.array([1.0 - self.smoothing]).float32()   
+            true_dist = true_dist.scatter(1, target.unsqueeze(1), fill_value)
+        return (-true_dist * log_probs).sum(dim=1).mean()
+
 def train_model(config_path, resume_path = None):
     
     with open(config_path, 'r') as f:
@@ -61,7 +75,7 @@ def train_model(config_path, resume_path = None):
     else :
         train_loader, val_loader = get_imagenet_dataloaders(config)
 
-    loss_func = nn.CrossEntropyLoss()
+    loss_func = LabelSmoothingCrossEntropy(smoothing=0.1) 
     start_epoch = 0
     best_top1_acc = 0.0
 
@@ -103,8 +117,8 @@ def train_model(config_path, resume_path = None):
             loss_func=loss_func
         )
         
-        cur_lr = optimizer.lr 
         scheduler.step()
+        cur_lr = optimizer.param_groups[0]['lr']
 
         
         epoch_time = time.time() - epoch_start_time
@@ -122,13 +136,13 @@ def train_model(config_path, resume_path = None):
         
         if val_top1_acc > best_top1_acc:
             best_top1_acc = val_top1_acc 
-            save_chk_point(get_save_dict(), save_dir, 'best_model.pth')
+            save_chk_point(get_save_dict(), save_dir, 'best_model.jt')
         
         if epoch % 10 == 0:
-            save_chk_point(get_save_dict(), save_dir, f'checkpoint_epoch_{epoch}.pth')
+            save_chk_point(get_save_dict(), save_dir, f'checkpoint_epoch_{epoch}.jt')
 
 
-    save_chk_point(get_save_dict(), save_dir, 'final_model.pth')
+    save_chk_point(get_save_dict(), save_dir, 'final_model.jt')
 
 
 def main():
