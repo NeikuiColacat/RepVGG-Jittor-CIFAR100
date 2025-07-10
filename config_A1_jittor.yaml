@@ -1,0 +1,23 @@
+model_name : "RepVGG_Jittor_A1_cifar"
+model_type: "A"
+scale_a: 1 
+scale_b: 2.5
+group_conv : 1
+num_classes : 100
+
+
+data_path : "/root/autodl-tmp/cifar100jittor"
+batch_size : 512 
+image_size : 32 
+
+epochs : 250 
+lr : 0.4
+weight_decay : 0.0005
+momentum : 0.9
+num_workers : 12
+min_lr : 0.000001 
+
+use_amp : false
+
+chk_point_dir : /root/autodl-tmp/chk_points/jittor_A1_cifar
+log_dir : /root/autodl-tmp/logs/jittor_A1_cifar
