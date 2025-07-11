@@ -20,11 +20,6 @@ venv/
 # ✅ Jupyter Notebook 检查点
 .ipynb_checkpoints/
 
-# ✅ 日志与输出
-logs/
-*.log
-*.out
-*.err
 
 # ✅ 模型权重与中间结果
 checkpoints/
