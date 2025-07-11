@@ -1,0 +1,23 @@
+model_name : "RepVGG_Torch_B1_cifar"
+model_type: "B"
+scale_a: 2 
+scale_b: 4 
+group_conv : 1
+num_classes : 100
+
+
+data_path : "/root/autodl-tmp/cifar100torch"
+batch_size : 512 
+image_size : 32 
+
+epochs : 300 
+lr : 0.1
+weight_decay : 0.0005
+momentum : 0.9
+num_workers : 12
+min_lr : 0.000001 
+
+use_amp : false
+
+chk_point_dir : /root/autodl-tmp/chk_points/torch_B1_cifar_lr1
+log_dir : /root/autodl-tmp/logs/torch_B1_cifar_lr1

@@ -6,6 +6,35 @@
 
 以jittor为后缀命名的源代码文件为jittor 实现 ， 以torch为后缀命名的为torch实现
 
+模型结构搭建遵循原作者论文[Ding, Xiaohan, et al. "Repvgg: Making vgg-style convnets great again." Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. 2021.](https://arxiv.org/abs/2101.03697)
+
+为了适应CIFAR-100数据集做出以下改动
+
+- 将5个stage的卷积通道缩放系数[64,64,128,256,512] 更换为 [32,32,64,128,256]
+- 将前两个stage的第一个RepVGG_block，卷积stride由2改为1
+
+具体结构变为如下表所示
+
+| Stage | Output size | RepVGG-A                | RepVGG-B                |
+|-------|-------------|-------------------------|-------------------------|
+| 1     | 32× 32| 1 × min(32, 32a)              | 1 × min(32, 32a)            |
+| 2     | 32× 32| 2 × 32a                       | 4 × 32a                     |
+| 3     | 16× 16| 4 × 64a                       | 6 × 64a                     |
+| 4     | 8× 8  | 14 × 128a                     | 16 × 128a                   |
+| 5     | 4 × 4 | 1 × 256b                      | 1 × 256b                    |
+
+缩放系数a、b保持原作者设置，如下表所示
+
+| Name       | Layers of each stage | a    | b    |
+|------------|-----------------------|------|------|
+| RepVGG-A0  | 1, 2, 4, 14, 1        | 0.75 | 2.5  |
+| RepVGG-A1  | 1, 2, 4, 14, 1        | 1    | 2.5  |
+| RepVGG-A2  | 1, 2, 4, 14, 1        | 1.5  | 2.75 |
+| RepVGG-B0  | 1, 4, 6, 16, 1        | 1    | 2.5  |
+| RepVGG-B1  | 1, 4, 6, 16, 1        | 2    | 4    |
+| RepVGG-B1g4| 1, 4, 6, 16, 1        | 2    | 4    |
+
+
 ## 环境配置
 
 **注意Jittor目前(截止到1.3.9.14版本) 对 conda支持并不完善 [点击查看issue](https://github.com/Jittor/jittor/issues/298) , 因而脚本使用venv进行环境管理** 
@@ -420,7 +449,7 @@ if __name__ == "__main__":
     main()
 ```
 
-## 结果log
+## 结果Log
 
 测试硬件环境 ： autodl云服务器
 
@@ -469,11 +498,6 @@ RAM : 60G
 | Jittor框架 | PyTorch框架 |
 |-----------|-------------|
 | ![RepVGG A0 Jittor Accuracy](train_logs/jittor_A0_cifar/RepVGG_Jittor_A0_cifar_accuracy.png) | ![RepVGG A0 Torch Accuracy](train_logs/torch_A0_cifar/RepVGG_Torch_A0_cifar_accuracy.png) |
-
-#### 学习率变化
-| Jittor框架 | PyTorch框架 |
-|-----------|-------------|
-| ![RepVGG A0 Jittor LR](train_logs/jittor_A0_cifar/RepVGG_Jittor_A0_cifar_learning_rate.png) | ![RepVGG A0 Torch LR](train_logs/torch_A0_cifar/RepVGG_Torch_A0_cifar_learning_rate.png) |
 
 ### RepVGG-A1 训练过程对比
 
@@ -535,14 +559,21 @@ RAM : 60G
 |-----------|-------------|
 | ![RepVGG B1g4 Jittor Accuracy](train_logs/jittor_B1g4_cifar/RepVGG_Jittor_B1g4_cifar_accuracy.png) | ![RepVGG B1g4 Torch Accuracy](train_logs/torch_B1g4_cifar/RepVGG_Torch_B1g4_cifar_accuracy.png) |
 
+
 ### ResNet18 训练过程对比
+
 
 #### 损失函数变化
 | Jittor框架 | PyTorch框架 |
 |-----------|-------------|
-| ![ResNet18 Jittor Loss](train_logs/jittor_resnet_cifar/ResNet18_Jittor_cifar_loss.png) | ![ResNet18 Torch Loss](train_logs/torch_resnet_cifar/ResNet18_Torch_cifar_loss.png) |
+| ![ResNet18 Jittor Loss](train_logs/jittor_resnet_cifar/resnet_jittor_cifar_loss.png) | ![ResNet18 Torch Loss](train_logs/torch_resnet_cifar/resnet_torch_cifar_loss.png) |
 
 #### 准确率变化
 | Jittor框架 | PyTorch框架 |
 |-----------|-------------|
-| ![ResNet18 Jittor Accuracy](train_logs/jittor_resnet_cifar/ResNet18_Jittor_cifar_accuracy.png) | ![ResNet18 Torch Accuracy](train_logs/torch_resnet_cifar/ResNet18_Torch_cifar_accuracy.png) |
+| ![ResNet18 Jittor Accuracy](train_logs/jittor_resnet_cifar/resnet_jittor_cifar_accuracy.png) | ![ResNet18 Torch Accuracy](train_logs/torch_resnet_cifar/resnet_torch_cifar_accuracy.png) |
+
+#### 学习率变化
+| Jittor框架 | PyTorch框架 |
+|-----------|-------------|
+| ![ResNet18 Jittor LR](train_logs/jittor_resnet_cifar/resnet_jittor_cifar_learning_rate.png) | ![ResNet18 Torch LR](train_logs/torch_resnet_cifar/resnet_torch_cifar_learning_rate.png) |
