@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from model.RepVGG_model_torch import RepVGG_Model
 from train.train_torch import  train_one_epoch, val_one_epoch
-from train.data_loader_torch import get_cifar100_dataloaders , get_imagenet_dataloaders
+from train.data_loader_torch import get_cifar100_dataloaders 
 from train.optimizer_torch import get_optimizer, get_scheduler
 from utils.train_logger import Logger
 
@@ -74,10 +74,7 @@ def train_model(config_path, resume_path = None):
     optimizer = get_optimizer(model, config)
     scheduler = get_scheduler(optimizer, config)
 
-    if 'cifar' in model_name: 
-        train_loader, val_loader = get_cifar100_dataloaders(config)
-    else :
-        train_loader, val_loader = get_imagenet_dataloaders(config)
+    train_loader, val_loader = get_cifar100_dataloaders(config)
 
     loss_func = nn.CrossEntropyLoss(label_smoothing=0.1)
     start_epoch = 0

@@ -6,10 +6,9 @@ import time
 import yaml
 from model.RepVGG_model_jittor import RepVGG_Model 
 from train.train_jittor import train_one_epoch , val_one_epoch
-from train.data_loader_jittor import get_cifar100_dataloaders , get_imagenet_dataloaders
+from train.data_loader_jittor import get_cifar100_dataloaders 
 from train.optimizer_jittor import get_optimizer, get_scheduler
 from utils.train_logger import Logger
-from jittor.models import resnet18
 import model.ResNet_model_jittor
 
 def create_model(config):
@@ -71,10 +70,7 @@ def train_model(config_path, resume_path = None):
     optimizer = get_optimizer(model, config)
     scheduler = get_scheduler(optimizer, config)
 
-    if 'cifar' in model_name:
-        train_loader, val_loader = get_cifar100_dataloaders(config)
-    else :
-        train_loader, val_loader = get_imagenet_dataloaders(config)
+    train_loader, val_loader = get_cifar100_dataloaders(config)
 
     loss_func = LabelSmoothingCrossEntropy(smoothing=0.1) 
     start_epoch = 0
