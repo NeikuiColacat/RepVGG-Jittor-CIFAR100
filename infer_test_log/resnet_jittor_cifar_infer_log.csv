@@ -1,0 +1,2 @@
+Model Name,Before Params(M),Before Speed(KFPS),Before acc,After Params(M),After Speed(KFPS),After acc
+resnet_jittor_cifar,2.83,94.89,75.84,2.83,94.8,75.84

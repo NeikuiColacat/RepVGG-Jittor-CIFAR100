@@ -1,0 +1,2 @@
+Model Name,Before Params(M),Before Speed(KFPS),Before acc,After Params(M),After Speed(KFPS),After acc
+RepVGG_Jittor_B0_cifar,3.73,44.54,77.04,3.33,79.83,77.03

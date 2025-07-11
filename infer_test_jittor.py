@@ -5,7 +5,7 @@ import time
 import csv
 
 from model.RepVGG_model_jittor import RepVGG_Model
-from train.data_loader_jittor import get_cifar100_dataloaders, get_imagenet_dataloaders
+from train.data_loader_jittor import get_cifar100_dataloaders
 
 jt.flags.use_cuda = 1  
 
@@ -61,7 +61,8 @@ def acc_test(config, chk_point_path):
 
     _, before_top1_acc, _ = tool.val_one_epoch(model, val_loader, jt.nn.CrossEntropyLoss())
 
-    model.convert_to_infer()
+    if 'resnet' not in config['model_name']:
+        model.convert_to_infer()
 
     _, after_top1_acc, _ = tool.val_one_epoch(model, val_loader, jt.nn.CrossEntropyLoss())
 
@@ -81,13 +82,16 @@ def infer_test(config_path):
 
     chk_point_path = config['chk_point_dir']
 
-    model.convert_to_infer()
+    if 'resnet' not in config['model_name']:
+        model.convert_to_infer()
 
     after_params = sum(p.numel() for p in model.parameters())
     after_params = round(after_params / 1e6,2)
     after_speed = speed_test(model)
 
     b_acc, a_acc = acc_test(config, chk_point_path)
+    b_acc , a_acc = round(b_acc , 2) , round(a_acc , 2)
+
     path = os.path.join('.', model_name + '_infer_log.csv')
     with open(path, mode='w', newline='') as csv_file:
         writer = csv.writer(csv_file)

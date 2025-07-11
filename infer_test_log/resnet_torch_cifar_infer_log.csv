@@ -1,0 +1,2 @@
+Model Name,Before Params(M),Before Speed(KFPS),Before acc,After Params(M),After Speed(KFPS),After acc
+resnet_cifar,2.82,81.57,75.7,2.82,81.65,75.7

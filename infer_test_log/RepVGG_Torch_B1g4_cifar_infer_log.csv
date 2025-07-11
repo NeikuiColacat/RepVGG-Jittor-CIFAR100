@@ -1,0 +1,2 @@
+Model Name,Before Params(M),Before Speed(KFPS),Before acc,After Params(M),After Speed(KFPS),After acc
+RepVGG_Torch_B1g4_cifar,9.6,13.07,78.84,8.63,26.19,78.83

@@ -1,7 +1,6 @@
 __pycache__/
 *.pyc
 chk_points/
-logs/
 
 
 # ✅ Python 编译缓存
@@ -46,7 +45,6 @@ events.out.tfevents.*
 *.npy
 *.pkl
 *.joblib
-*.csv
 *.tsv
 
 # ✅ 图像与可视化输出
