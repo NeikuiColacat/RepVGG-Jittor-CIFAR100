@@ -4,21 +4,7 @@ from jittor.dataset import ImageFolder
 import jittor.transform as transform
 from jittor.dataset.cifar import CIFAR100
 from torchvision import transforms
-import os
-
-
-from PIL import ImageOps
 from jittor import transform
-
-# class PadThenCrop:
-#     def __init__(self, padding, crop_size):
-#         self.padding = padding
-#         self.crop_size = crop_size
-#         self.crop = transform.RandomCrop(crop_size)
-
-#     def __call__(self, img):
-#         img = ImageOps.expand(img, border=self.padding, fill=0)
-#         return self.crop(img)
 
 def get_cifar100_dataloaders(config):
     batch_size = config['batch_size']

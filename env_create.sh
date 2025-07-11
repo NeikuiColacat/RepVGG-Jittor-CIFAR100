@@ -9,3 +9,7 @@ python3.11 -m venv repvgg
 source repvgg/bin/activate
 
 pip install -r requirements.txt
+
+python3.11 -m jittor.test.test_example
+
+python3.11 -m jittor.test.test_cudnn_op
