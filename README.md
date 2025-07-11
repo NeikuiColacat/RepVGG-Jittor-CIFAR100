@@ -576,4 +576,4 @@ RAM : 60G
 #### 学习率变化
 | Jittor框架 | PyTorch框架 |
 |-----------|-------------|
-| ![ResNet18 Jittor LR](train_logs/jittor_resnet_cifar/resnet_jittor_cifar_learning_rate.png) | ![ResNet18 Torch LR](train_logs/torch_resnet_cifar/resnet_torch_cifar_learning_rate.png) |
+| ![ResNet18 Jittor LR](train_logs/jittor_cifar_learning_rate.png) | ![ResNet18 Torch LR](train_logs/torch_learning_rate.png) |
