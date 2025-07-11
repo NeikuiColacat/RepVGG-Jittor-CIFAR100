@@ -6,7 +6,7 @@ group_conv : 1
 num_classes : 100
 
 
-data_path : "/root/autodl-tmp/cifar100jittor"
+data_path : "./cifar100jittor"
 batch_size : 512 
 image_size : 32 
 
@@ -19,5 +19,5 @@ min_lr : 0.000001
 
 use_amp : false
 
-chk_point_dir : /root/autodl-tmp/chk_points/jittor_A0_cifar
-log_dir : /root/autodl-tmp/logs/jittor_A0_cifar
+chk_point_dir : ./chk_points/jittor_A0_cifar
+log_dir : ./logs/jittor_A0_cifar

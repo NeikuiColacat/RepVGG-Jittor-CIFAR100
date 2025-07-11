@@ -6,7 +6,7 @@ model_name : "resnet_jittor_cifar"
 # num_classes : 1000
 
 
-data_path : "/root/autodl-tmp/cifar100jittor"
+data_path : "./cifar100jittor"
 batch_size : 512 
 image_size : 32 
 
@@ -15,10 +15,9 @@ lr : 0.4
 weight_decay : 0.0005
 momentum : 0.9
 num_workers : 12
-# warmup_epochs : 5
 min_lr : 0.00001 
 
 use_amp : false
 
-chk_point_dir : /root/autodl-tmp/chk_points/jittor_resnet_cifar
-log_dir : /root/autodl-tmp/logs/jittor_resnet_cifar
+chk_point_dir : ./chk_points/jittor_resnet_cifar
+log_dir : ./logs/jittor_resnet_cifar

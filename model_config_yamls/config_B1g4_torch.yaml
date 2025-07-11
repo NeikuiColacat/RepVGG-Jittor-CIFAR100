@@ -6,7 +6,7 @@ group_conv : 4
 num_classes : 100
 
 
-data_path : "/root/autodl-tmp/cifar100torch"
+data_path : "./cifar100torch"
 
 batch_size: 512 
 image_size: 32 
@@ -16,10 +16,9 @@ lr : 0.4
 weight_decay : 0.0005
 momentum : 0.9
 num_workers : 12
-# warmup_epochs : 5
 min_lr : 0.000001 
 
 use_amp : false
 
-chk_point_dir : /root/autodl-tmp/chk_points/torch_B1g4_cifar
-log_dir : /root/autodl-tmp/logs/torch_B1g4_cifar
+chk_point_dir : ./chk_points/torch_B1g4_cifar
+log_dir : ./logs/torch_B1g4_cifar

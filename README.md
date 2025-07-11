@@ -39,8 +39,6 @@
 
 **注意Jittor目前(截止到1.3.9.14版本) 对 conda支持并不完善 [点击查看issue](https://github.com/Jittor/jittor/issues/298) , 因而脚本使用venv进行环境管理** 
 
-**如遇到Jittor自带的Cutlass库下载链接失效 [点击查看issue](https://discuss.jittor.org/t/topic/936) 使用该链接替换 `https://cg.cs.tsinghua.edu.cn/jittor/assets/cutlass.zip`**
-
 环境配置脚本 `repo/env_create.sh`: 
 
 ```bash
@@ -60,6 +58,21 @@ python3.11 -m jittor.test.test_example
 
 python3.11 -m jittor.test.test_cudnn_op
 ```
+
+**如遇到Jittor自带的Cutlass库下载链接失效 [点击查看issue](https://discuss.jittor.org/t/topic/936)**
+
+使用以下脚本修复  `repo/jittor_cutlass_fix.sh`
+
+```bash
+#!/bin/bash
+cd ~/.cache/jittor/
+mkdir cutlass
+cd cutlass
+wget https://cg.cs.tsinghua.edu.cn/jittor/assets/cutlass.zip
+apt install unzip
+unzip cutlass.zip
+```
+
 
 ##  数据准备
 
