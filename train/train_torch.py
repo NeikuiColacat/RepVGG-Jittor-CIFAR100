@@ -9,21 +9,6 @@ from torch.cuda.amp import autocast, GradScaler
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# def mixup_data(x, y, alpha=1.0):
-#     if alpha > 0:
-#         lam = np.random.beta(alpha, alpha)
-#     else:
-#         lam = 1.0
-#     batch_size = x.size(0)
-#     index = torch.randperm(batch_size).to(x.device)
-
-#     mixed_x = lam * x + (1 - lam) * x[index, :]
-#     y_a, y_b = y, y[index]
-#     return mixed_x, y_a, y_b, lam
-
-# def mixup_loss_func(loss_func, pred, y_a, y_b, lam):
-#     return lam * loss_func(pred, y_a) + (1 - lam) * loss_func(pred, y_b)
-
 
 def train_one_epoch(model: nn.Module, train_lodaer: DataLoader, optimizer: torch.optim.SGD, loss_func: nn.CrossEntropyLoss, epoch_idx, scaler):
     model.train()
@@ -37,20 +22,7 @@ def train_one_epoch(model: nn.Module, train_lodaer: DataLoader, optimizer: torch
         data , target = data.to(device,non_blocking=True) , target.to(device,non_blocking=True) ,
         optimizer.zero_grad()
 
-        # if scaler is not None: 
-        #     with torch.autocast(device_type='cuda'):
-
-        #         output = model(data)
-        #         loss = loss_func(output , target) 
-
-        #     scaler.scale(loss).backward()
-        #     scaler.step(optimizer)
-        #     scaler.update()
-        # else :
-        # input , tar_a , tar_b , lam = mixup_data(data,target)
-
         output = model(data)
-        # loss = mixup_loss_func(loss_func , output ,  tar_a , tar_b , lam)
         loss=loss_func(output,target)
         loss.backward()
         optimizer.step()
