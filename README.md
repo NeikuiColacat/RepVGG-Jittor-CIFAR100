@@ -480,7 +480,7 @@ RAM : 60G
 #### 损失函数变化
 | Jittor框架 | PyTorch框架 |
 |-----------|-------------|
-| ![RepVGG A1 Jittor Loss](train_logs/jittor_A1_cifar/RepVGG_Jittor_A1_cifar_loss.png) | ![RepVGG A1 Torch Loss](train_logs/torch_A1_cifar/RepVGG_Torch_A1_cifar_loss.png) |
+| ![RepVGG A1 Jittor Loss](./train_logs/jittor_A1_cifar/RepVGG_Jittor_A1_cifar_loss.png) | ![RepVGG A1 Torch Loss](train_logs/torch_A1_cifar/RepVGG_Torch_A1_cifar_loss.png) |
 
 #### 准确率变化
 | Jittor框架 | PyTorch框架 |
