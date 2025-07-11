@@ -1,9 +1,11 @@
 #!/bin/bash
 
-conda create -n repvgg python=3.11
+sudo apt update
 
-conda activate repvgg
+sudo apt install -y python3.11 python3.11-venv python3.11-dev
 
-pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu128
+python3.11 -m venv repvgg 
+
+source repvgg/bin/activate
 
 pip install -r requirements.txt
