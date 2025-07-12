@@ -153,6 +153,7 @@ chk_point_dir : ./chk_points/jittor_A0_cifar
 log_dir : ./logs/jittor_A0_cifar
 ```
 
+---
 
 可使用命令`python main_train_jittor.py --config <your yaml config path>` 对某个模型单独训练
 
@@ -347,6 +348,8 @@ for config_file in model_config_yamls/*.yaml; do
     fi
 done
 ```
+
+---
 
 可使用命令`python infer_test_jittor.py --config <your yaml file path>`对某个模型单独测试
 
