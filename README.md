@@ -147,7 +147,7 @@ log_dir : ./logs/jittor_A0_cifar
 
 可使用命令`python main_train_jittor.py --config <your yaml config path>` 对某个模型单独训练
 
-`/repo_path/main_train_jittor.py` 源码如下所示
+`main_train_jittor.py` 源码如下所示
 
 ```python
 import jittor as jt
@@ -341,7 +341,7 @@ done
 
 该脚本默认对配置yaml文件下的 `chk_point_dir` 目录中命名为`best_model.jt`的文件进行权重加载
 
-`/repo_path/infer_test_jittor.py` 源码如下所示
+`infer_test_jittor.py` 源码如下所示
 
 ```python
 import jittor as jt
