@@ -520,11 +520,11 @@ if __name__ == "__main__":
 
 测试硬件环境 ： autodl云服务器
 
-CPU : 18 vCPU AMD EPYC 9754 128-Core Processor
+- CPU : 18 vCPU AMD EPYC 9754 128-Core Processor
 
-GPU : RTX 4090D
+- GPU : RTX 4090D
 
-RAM : 60G
+- RAM : 60G
 
 ### Jittor框架实现:
 
