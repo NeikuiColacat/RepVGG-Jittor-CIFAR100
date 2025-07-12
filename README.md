@@ -329,7 +329,11 @@ if __name__ == "__main__":
     
 ```
 
-## 测试脚本  `/repo_path/test_infer_all.sh`
+## 模型推理测试  
+
+批量推理测试脚本 : `/repo_path/test_infer_all.sh`
+
+该脚本会调用 `/repo_path/infer_test_jittor.py` 对 `model_config_yamls` 文件夹下所有配置文件的模型进行推理测试 ，并将测试结果保存为csv文件
 
 ```bash
 #!/bin/bash
@@ -341,8 +345,6 @@ for config_file in model_config_yamls/*.yaml; do
     fi
 done
 ```
-
-该脚本会调用 `/repo_path/infer_test_jittor.py` 对 `model_config_yamls` 文件夹下所有配置文件的模型进行推理测试 ，并将测试结果保存为csv文件
 
 可使用命令`python infer_test_jittor.py --config <your yaml file path>`对某个模型单独测试
 
