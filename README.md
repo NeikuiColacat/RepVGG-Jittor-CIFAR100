@@ -527,6 +527,8 @@ if __name__ == "__main__":
 - weight_decay : `5e-4`
 - Nesterov momentum : `0.9`
 - CosineAnnealing eta_min: `1e-6`
+- label smoothing : `0.1`
+- warmup : `20 epochs`
 
 ---
 
