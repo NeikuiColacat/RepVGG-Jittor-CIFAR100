@@ -512,7 +512,7 @@ if __name__ == "__main__":
 | RepVGG-B1  | 1, 4, 6, 16, 1        | 2    | 4    |
 | RepVGG-B1g4| 1, 4, 6, 16, 1        | 2    | 4    |
 
-使用ResNet18作为baseline模型进行对比，使用同样方式将其5个stage的通道数改为 [32,32,64,128,256]，前两个stage卷积stride同样改为1
+使用ResNet18作为baseline模型进行对比，使用同样方式将ResNet18的5个stage的通道数改为 [32,32,64,128,256]，前两个stage卷积stride同样改为1
 
 ### 训练细节
 
@@ -539,6 +539,8 @@ if __name__ == "__main__":
 - GPU : RTX 4090D
 
 - RAM : 60G
+
+[训练好的模型权重文件下载](https://drive.google.com/file/d/1qtc4cPNPh68iSe4KAh5I86TGfhvVNQT1/view?usp=sharing)
 
 ### Jittor框架实现:
 
