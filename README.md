@@ -37,9 +37,6 @@ unzip cutlass.zip
 
 使用 Jittor 官方提供的 `jittor.dataset.CIFAR100`
 
-        
-**(调用下文提到的训练脚本即可自动下载CIFAR100，无需单独运行该py文件)**
-
 ```python
 import jittor as jt
 import jittor.nn as nn
