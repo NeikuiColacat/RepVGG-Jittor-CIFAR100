@@ -4,6 +4,8 @@
 
 这是一个使用Jittor框架实现的RepVGG ，并在CIFAR100上进行测试，带有与Jittor实现对齐的Torch源码
 
+所实现的训练测试等脚本均有torch版本对齐，以`*_torch`为结尾命名，与Jittor脚本使用方法一致
+
 ## 环境配置 
 
 **注意Jittor目前(截止到1.3.9.14版本) 对 conda支持并不完善 [点击查看issue](https://github.com/Jittor/jittor/issues/298) , 因而脚本使用venv进行环境管理**
