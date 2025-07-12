@@ -491,6 +491,8 @@ if __name__ == "__main__":
 - 将5个stage的卷积通道缩放系数[64,64,128,256,512] 更换为 [32,32,64,128,256]
 - 将前两个stage的第一个RepVGG_block，卷积stride由2改为1
 
+---
+
 具体结构变为如下表所示
 
 | Stage | Output size | RepVGG-A                | RepVGG-B                |
@@ -526,11 +528,15 @@ if __name__ == "__main__":
 - Nesterov momentum : `0.9`
 - CosineAnnealing eta_min: `1e-6`
 
+---
+
 数据增强方法包括 :
 - RandAugment , `N=2,M=9`
 - RandomCrop , `size=32,padding=4`
 - RandomHorizontalFlip , `p=0.5`
 - ImageNormalize , `mean=[0.5071, 0.4867, 0.4408], std=[0.2675, 0.2565, 0.2761]`
+
+---
 
 测试硬件环境 ： autodl云服务器
 
