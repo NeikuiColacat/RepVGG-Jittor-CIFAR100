@@ -6,11 +6,9 @@
 
 以`*_jittor.py`后缀命名jittor源码 ， 以`*torch.py`后缀命名的为torch源码
 
-## 环境配置
+## 环境配置脚本 `repo_path/env_create.sh`
 
 **注意Jittor目前(截止到1.3.9.14版本) 对 conda支持并不完善 [点击查看issue](https://github.com/Jittor/jittor/issues/298) , 因而脚本使用venv进行环境管理** 
-
-环境配置脚本 `repo/env_create.sh`: 
 
 ```bash
 #!/bin/bash
@@ -24,8 +22,7 @@ python3.11 -m jittor.test.test_cudnn_op
 ```
 
 **如遇到Jittor自带的Cutlass库下载链接失效 [点击查看issue](https://discuss.jittor.org/t/topic/936)**
-
-使用以下脚本修复  `repo/jittor_cutlass_fix.sh`
+使用以下脚本修复  `repo_path/jittor_cutlass_fix.sh`
 
 ```bash
 #!/bin/bash
@@ -38,7 +35,7 @@ unzip cutlass.zip
 ```
 
 
-##  数据准备脚本`repo/train/data_loader_jittor.py`
+##  数据准备脚本`repo_path/train/data_loader_jittor.py`
 
 使用 Jittor 官方提供的 `jittor.dataset.CIFAR100`
 
@@ -103,7 +100,7 @@ def get_cifar100_dataloaders(config):
     return train_loader, val_loader 
 ```
 
-## 训练脚本`/repo/train_all_jittor.sh`
+## 训练脚本`/repo_path/train_all_jittor.sh`
 
 ```bash
 #!/bin/bash
@@ -114,15 +111,45 @@ for config_file in model_config_yamls/*.yaml; do
 done
 ```
 
-该脚本会调用 `/repo/main_train_jittor.py` 对 `model_config_yamls` 文件夹下所有配置文件的模型进行训练
+该脚本会调用 `/repo_path/main_train_jittor.py` 对 `model_config_yamls` 文件夹下默认写好的配置文件对应模型进行训练
 
-可以在yaml配置文件中修改你的模型权重文件与日志文件保存路径
+可自定义配置，yaml配置文件样例如下:
+```yaml
+# 模型名称 ，随意填写
+model_name : "RepVGG_Jittor_A0_cifar"
+# 选择RepVGG A 或 RepVGG B架构 , 可填 "A" 或 "B"
+model_type: "A"
+# 卷积通道数量缩放因子
+scale_a: 0.75
+scale_b: 2.5
+# 分组卷积分组数量
+group_conv : 1
+# 数据集分类类别数量 
+num_classes : 100
 
-jittor框架训练命令  `./train_all_jittor.sh`
+#数据集路径
+data_path : "./cifar100jittor"
 
-torch框架训练命令:   `./train_all_torch.sh`
+#################训练参数
+batch_size : 512 
+image_size : 32 
 
-## 测试脚本  `/repo/test_infer_all.sh`
+epochs : 250 
+lr : 0.4
+weight_decay : 0.0005
+momentum : 0.9
+# CPU内存过小建议调小num_workers,或者在 repo_path/train/data_loader_jittor.py 中将buffer_size降低
+num_workers : 12
+min_lr : 0.000001 
+#################训练参数
+
+# 模型权重保存路径
+chk_point_dir : ./chk_points/jittor_A0_cifar
+# 训练日志保存路径
+log_dir : ./logs/jittor_A0_cifar
+```
+
+## 测试脚本  `/repo_path/test_infer_all.sh`
 
 ```bash
 #!/bin/bash
@@ -135,9 +162,9 @@ for config_file in model_config_yamls/*.yaml; do
 done
 ```
 
-该脚本会调用 `/repo/infer_test_jittor.py` 对 `model_config_yamls` 文件夹下所有配置文件的模型进行推理测试 ，并将测试结果保存为csv文件
+该脚本会调用 `/repo_path/infer_test_jittor.py` 对 `model_config_yamls` 文件夹下所有配置文件的模型进行推理测试 ，并将测试结果保存为csv文件
 
-使用该脚本前，注意配置好yaml文件下的 `chk_point_dir`，以便让测试py脚本找到模型权重文件
+该脚本默认对配置yaml文件下的 `chk_point_dir` 目录中命名为`best_model.jt`的文件进行权重加载
 
 ## 结果Log
 
