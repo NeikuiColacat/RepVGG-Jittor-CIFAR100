@@ -4,8 +4,6 @@
 
 这是一个使用Jittor框架实现的RepVGG ，并在CIFAR100上进行测试，带有与Jittor实现对齐的Torch源码
 
-以`*_jittor.py`后缀命名jittor源码 ， 以`*torch.py`后缀命名的为torch源码
-
 ## 环境配置脚本 `repo_path/env_create.sh`
 
 **注意Jittor目前(截止到1.3.9.14版本) 对 conda支持并不完善 [点击查看issue](https://github.com/Jittor/jittor/issues/298) , 因而脚本使用venv进行环境管理** 
