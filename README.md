@@ -4,9 +4,11 @@
 
 这是一个使用Jittor框架实现的RepVGG ，并在CIFAR100上进行测试，带有与Jittor实现对齐的Torch源码
 
-## 环境配置脚本 `repo_path/env_create.sh`
+## 环境配置 
 
-**注意Jittor目前(截止到1.3.9.14版本) 对 conda支持并不完善 [点击查看issue](https://github.com/Jittor/jittor/issues/298) , 因而脚本使用venv进行环境管理** 
+**注意Jittor目前(截止到1.3.9.14版本) 对 conda支持并不完善 [点击查看issue](https://github.com/Jittor/jittor/issues/298) , 因而脚本使用venv进行环境管理**
+
+安装脚本:`repo_path/env_create.sh`
 
 ```bash
 #!/bin/bash
@@ -33,9 +35,11 @@ unzip cutlass.zip
 ```
 
 
-##  数据准备脚本`repo_path/train/data_loader_jittor.py`
+##  数据准备
 
 使用 Jittor 官方提供的 `jittor.dataset.CIFAR100`
+
+使用`repo_path/train/data_loader_jittor.py` 获取dataloader , 源码如下所示
 
 ```python
 import jittor as jt
@@ -95,7 +99,11 @@ def get_cifar100_dataloaders(config):
     return train_loader, val_loader 
 ```
 
-## 训练脚本`/repo_path/train_all_jittor.sh`
+## 模型训练
+
+批量训练脚本: `/repo_path/train_all_jittor.sh`
+
+该脚本会调用 `/repo_path/main_train_jittor.py` 对 `model_config_yamls` 文件夹下默认写好的配置文件对应模型进行训练
 
 ```bash
 #!/bin/bash
@@ -106,7 +114,6 @@ for config_file in model_config_yamls/*.yaml; do
 done
 ```
 
-该脚本会调用 `/repo_path/main_train_jittor.py` 对 `model_config_yamls` 文件夹下默认写好的配置文件对应模型进行训练
 
 可自定义配置，yaml配置文件样例如下:
 ```yaml
